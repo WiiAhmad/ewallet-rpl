@@ -14,149 +14,162 @@ This document provides details on the available API endpoints for the wallet ser
 Register a new user account.
 - **Access**: Public
 - **Request Body**:
-  ```json
-  {
-    "name" : "user",
-    "phone" : "+62",
-    "email": "user@example.com",
-    "password": "yourstrongpassword"
-  }
-- **Success Response (201)**:
-```json
+    ```json
     {
-    "message": "User registered successfully",
-    "data": {
-        "id": "clw...", // UUID
         "name" : "user",
         "phone" : "+62",
         "email": "user@example.com",
-        }
+        "password": "yourstrongpassword"
     }
-```
-- **Failed Response**:
-```json
+    ```
+- **Success Response (201)**:
+    ```json
     {
-    "message": "Username must not blank, etc",
+        "message": "User registered successfully",
+        "data": {
+            "id": "clw...", // UUID
+            "name" : "user",
+            "phone" : "+62",
+            "email": "user@example.com",
+            }
     }
-```
+    ```
+- **Failed Response**:
+    ```json
+    {
+        "message": "Username must not blank, etc",
+    }
+    ```
 
 
 ### **`POST /auth/login`**
 Log in to receive access
 - **Access**: Public
 - **Request Body**:
-  ```json
-  {
-    "email": "user@example.com",
-    "password": "yourstrongpassword"
-  }
+    ```json
+    {
+        "email": "user@example.com",
+        "password": "yourstrongpassword"
+    }
+    ```
 
 - **Success Response (200)**:
-```json
+    ```json
     {
-    "message": "Login successful",
-    "data": {
-        "id": "clw...",
-        "name" : "user",
-        "email": "user@example.com",
-    },
-    "tokens": "ey...",
+        "message": "Login successful",
+        "data": {
+            "id": "clw...",
+            "name" : "user",
+            "email": "user@example.com",
+        },
+        "tokens": "Bearer ey...",
     }
-```
+    ```
 - **Failed Response (400)**:
-```json
+    ```json
     {
-    "message": "Username must not blank, etc",
+        "message": "Username must not blank, etc",
     }
-```
+    ```
 
 ### **`POST /auth/logout`**
 Logout the user
-- **Body**
-```json
+
+- **Headers** : *`Authorization: Bearer <your_access_token>`*
+
+- **Unauthorized Response (401)**:
+    ```json
     {
-        "token" : "ey...."
+        "message": "User Unauthorized, Please Login Again",
     }
-```
-- **Success Response (204)**:
+    ```
+
+- **Invalid Response (403)**:
+    ```json
+    {
+        "message": "Invalid User",
+    }
+    ```
+
+- **Success Response (204)**: No content
 
 ## 2. Users (`/user`)
 ### **`GET /user/me`**
 Check users
 - **Access**: Private (User)
-- **Body**
-```json
-    {
-        "token" : "ey...."
-    }
-```
+- **Headers** : *`Authorization: Bearer <your_access_token>`*
+
 - **Success Response (200)**:
-```json
+    ```json
     {
-    "message": "User Found successful",
-    "data": {
-        "id": "clw...", // UUID
-        "name" : "user",
-        "phone" : "+62",
-        "email": "user@example.com",
-        "address" : "test",
-        }
+        "message": "User Found successful",
+        "data": {
+            "id": "clw...", // UUID
+            "name" : "user",
+            "phone" : "+62",
+            "email": "user@example.com",
+            "address" : "test",
+            }
     }
-```
+    ```
 - **Unauthorized Response (401)**:
-```json
+    ```json
     {
-    "message": "User Unauthorized, Please Login Again",
+        "message": "User Unauthorized, Please Login Again",
     }
-```
+    ```
+- **Invalid Response (403)**:
+    ```json
+    {
+        "message": "Invalid User",
+    }
+    ```
 
 ### **`PUT /user/me`**
 Update Users
 - **Access**: Private (User)
-- **Body**
-```json
-    {
-        "token" : "ey...."
-    }
-```
+- **Headers** : *`Authorization: Bearer <your_access_token>`*
+
 - **Success Response (200)**:
-```json
+    ```json
     {
-    "message": "Update successful",
-    "data": {
-        "id": "clw...", // UUID
-        "name" : "user",
-        "phone" : "+62",
-        "email": "user@example.com",
-        "address" : "test",
-        }
+        "message": "Update successful",
+        "data": {
+            "id": "clw...", // UUID
+            "name" : "user",
+            "phone" : "+62",
+            "email": "user@example.com",
+            "address" : "test",
+            }
     }
-```
+    ```
 - **Failed Response (400)**:
-```json
+    ```json
     {
-    "message": "field must not blank, etc",
+        "message": "field must not blank, etc",
     }
-```
+    ```
 - **Unauthorized Response (401)**:
-```json
+    ```json
     {
-    "message": "User Unauthorized, Please Login Again",
+        "message": "User Unauthorized, Please Login Again",
     }
-```
+    ```
+- **Invalid Response (403)**:
+    ```json
+    {
+        "message": "Invalid User",
+    }
+    ```
 
 ## 3. Wallets (`/wallets`)
 ### **`GET /wallets/me`**
 Get all wallets belonging to the authenticated user.
 - **Access**: Private (User)
-- **Body**
-```json
-    {
-        "token" : "ey...."
-    }
-```
+- **Headers** : *`Authorization: Bearer <your_access_token>`*
+
 - **Success Response (200)**:
-```json
+    ```json
     {
         "data" : [
             {
@@ -175,29 +188,36 @@ Get all wallets belonging to the authenticated user.
             },
         ]
     }
-```
+    ```
 - **Unauthorized Response (401)**:
-```json
+    ```json
     {
-    "message": "User Unauthorized, Please Login Again",
+        "message": "User Unauthorized, Please Login Again",
     }
-```
+    ```
+- **Invalid Response (403)**:
+    ```json
+    {
+        "message": "Invalid User",
+    }
+    ```
 
 ### **`POST /wallets`**
 Create a new wallet for the authenticated user.
 - **Access**: Private (User)
+- **Headers** : *`Authorization: Bearer <your_access_token>`*
+
 - **Body**
-```json
+    ```json
     {
         "data" : {
             "name": "My Second Wallet",
             "desc" : "smth",
-        },
-        "token" : "ey...."
+        }
     }
-```
+    ```
 - **Success Response (200)**:
-```json
+    ```json
     {
         "message" : "Created wallet successfully",
         "data" : {
@@ -208,36 +228,43 @@ Create a new wallet for the authenticated user.
             "desc" : "smth",
         }
     }
-```
+    ```
 - **Failed Response (400)**:
-```json
+    ```json
     {
         "message": "name must not blank, etc",
     }
-```
+    ```
 - **Unauthorized Response (401)**:
-```json
+    ```json
     {
         "message": "User Unauthorized, Please Login Again",
     }
-```
+    ```
+- **Invalid Response (403)**:
+    ```json
+    {
+        "message": "Invalid User",
+    }
+    ```
 
 ### **`PUT /wallets/:id`**
 Update wallet
 - **URL Params**: id=[number wallet]
 - **Access**: Private (User)
+- **Headers** : *`Authorization: Bearer <your_access_token>`*
+
 - **Body**
-```json
+    ```json
     {
         "data" : {
             "name": "My Second Wallet",
             "desc" : "smth",
-        },
-        "token" : "ey...."
+        }
     }
-```
+    ```
 - **Success Response (200)**:
-```json
+    ```json
     {
         "message" : "Update wallet successfully",
         "data" : {
@@ -245,45 +272,53 @@ Update wallet
             "desc" : "smth",
         }
     }
-```
+    ```
 - **Failed Response (400)**:
-```json
+    ```json
     {
-    "message": "name must not blank, etc",
+        "message": "name must not blank, etc",
     }
-```
+    ```
 - **Unauthorized Response (401)**:
-```json
+    ```json
     {
-    "message": "User Unauthorized, Please Login Again",
+        "message": "User Unauthorized, Please Login Again",
     }
-```
+    ```
+- **Invalid Response (403)**:
+    ```json
+    {
+        "message": "Invalid User",
+    }
+    ```
 
 ### **`Delete /wallets/:id`**
 Delete wallet
 - **URL Params**: id=[number wallet]
 - **Access**: Private (User)
-- **Body**
-```json
-    {
-        "token" : "ey...."
-    }
-```
+- **Headers** : *`Authorization: Bearer <your_access_token>`*
+
 - **Success Response (200)**:
-```json
+    ```json
     {
         "message" : "Delete wallet successfully",
     }
-```
+    ```
 - **Unauthorized Response (401)**:
-```json
+    ```json
     {
         "message": "User Unauthorized, Please Login Again",
     }
-```
+    ```
 - **Failed Response (404)**:
-```json
+    ```json
     {
         "message": "Wallet not found",
     }
-```
+    ```
+- **Invalid Response (403)**:
+    ```json
+    {
+        "message": "Invalid User",
+    }
+    ```
