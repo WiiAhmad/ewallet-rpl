@@ -2,6 +2,9 @@
 after clonning repo
 
 cd to folder 
+```
+npm install
+```
 
 for install all dependencies run this
 ```
@@ -23,7 +26,7 @@ npm run dev
 
 
 ## How to Contribute?
-make sure create branch for work **dont push to main**
+make sure create branch for work **dont push to main** push to dev
 
 ```
 git branch "name"       # example git branch x
