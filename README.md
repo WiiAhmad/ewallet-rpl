@@ -1,27 +1,32 @@
 # TO RUN THIS
 after clonning repo
 
-Server
+cd to folder 
+
+for install all dependencies run this
 ```
-cd server
-npm i
+npm run all
+```
+
+for run both server and client
+```
 npm run dev
 ```
 
-Client
-```
-cd client
-npm run dev
-npm i
-```
+## Server
+[README.MD SERVER](/server/README.md)
+
+[API DOCUMENTATION SERVER](/server/Api-Docs.md)
+
+## Client
+[README.MD CLIENT](/client/README.md)
 
 
-How to Contribute?
-
+## How to Contribute?
 make sure create branch for work **dont push to main**
 
 ```
-git branch "name" // example git branch x
-git checkout "name" // example git checkout x
+git branch "name"       # example git branch x
+git checkout "name"     # example git checkout x
 ```
 done!!!
