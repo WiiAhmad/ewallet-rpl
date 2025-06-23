@@ -58,7 +58,7 @@ Log in to receive access
     {
         "message": "Login successful",
         "data": {
-            "id": "clw...",
+            "id": "clw...", // UUID
             "name" : "user",
             "email": "user@example.com",
         },
@@ -173,14 +173,14 @@ Get all wallets belonging to the authenticated user.
     {
         "data" : [
             {
-            "id": "wallet 1...",
+            "id": "clw...", // UUID
             "name": "My Primary Wallet",
             "number": "WLT-...",
             "balance": 100.50,
             "desc" : "smth",
             },
             {
-            "id": "wallet 2...",
+            "id": "clw...", // UUID
             "name": "My Second Wallet",
             "number": "WLT-...",
             "balance": 100.50,
@@ -199,6 +199,49 @@ Get all wallets belonging to the authenticated user.
     ```json
     {
         "message": "Invalid User",
+    }
+    ```
+- **Failed Response (404)**:
+    ```json
+    {
+        "message": "Wallet not found",
+    }
+    ```
+
+### **`GET /wallets/:id`**
+Get wallets belong to the user (this use before transcation for checking wallet another users).
+- **URL Params**: id=[number wallet]
+- **Access**: Private (User)
+- **Headers** : *`Authorization: Bearer <your_access_token>`*
+
+- **Success Response (200)**:
+    ```json
+    {
+        "id": "clw...", // UUID
+        "name": "Recipient's Wallet Name",
+        "number": "WLT-...",
+        "user": {
+            "name" : "name user",
+            "email": "recipient@example.com"
+        }
+    }
+    ```
+- **Unauthorized Response (401)**:
+    ```json
+    {
+        "message": "User Unauthorized, Please Login Again",
+    }
+    ```
+- **Invalid Response (403)**:
+    ```json
+    {
+        "message": "Invalid User",
+    }
+    ```
+- **Failed Response (404)**:
+    ```json
+    {
+        "message": "Wallet not found",
     }
     ```
 
@@ -221,7 +264,7 @@ Create a new wallet for the authenticated user.
     {
         "message" : "Created wallet successfully",
         "data" : {
-            "id": "New wallet...",
+            "id": "clw...", // UUID
             "name": "My Second Wallet",
             "number": "WLT-...",
             "balance": 0,
@@ -291,6 +334,12 @@ Update wallet
         "message": "Invalid User",
     }
     ```
+- **Failed Response (404)**:
+    ```json
+    {
+        "message": "Wallet not found",
+    }
+    ```
 
 ### **`Delete /wallets/:id`**
 Delete wallet
@@ -310,15 +359,50 @@ Delete wallet
         "message": "User Unauthorized, Please Login Again",
     }
     ```
+- **Invalid Response (403)**:
+    ```json
+    {
+        "message": "Invalid User",
+    }
+    ```
 - **Failed Response (404)**:
     ```json
     {
         "message": "Wallet not found",
     }
     ```
-- **Invalid Response (403)**:
+
+## 4. Transfer (`/wallets/transfer`)
+### **`POST  /wallets/transfer`**
+-   **Headers:** `Authorization: Bearer <userAccessToken>`
+-   **Request Body:**
     ```json
     {
-        "message": "Invalid User",
+        "fromWalletId": "WLT-...",
+        "toWalletNumber": "WLT-...",
+        "amount": 50,
+        "note" : "test"
+    }
+    ```
+- **Success Response (200)**:
+    ```json
+    {
+      "message": "Transfer successful",
+      "data": {
+        "updatedFromWallet": { "... "},
+        "updatedToWallet": { "..." }
+      }
+    }
+    ```
+-   **Error Response (400):**
+    ```json
+    {
+        "message": "Insufficient funds."
+    }
+    ```
+- **Unauthorized Response (401)**:
+    ```json
+    {
+        "message": "User Unauthorized, Please Login Again",
     }
     ```
