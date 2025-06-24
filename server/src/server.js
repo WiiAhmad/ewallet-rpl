@@ -1,8 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { createUserHandler, getUserByIdHandler, deleteUserByIdHandler } from './server/user.js';
-import { createAuthHandler } from './server/auth.js';
+import { registerHandler, createAuthHandler } from './server/auth.js';
+import { getMeHandler } from './server/user.js';
 import { authenticateJWT } from './middleware.js';
 
 const prisma = new PrismaClient();
@@ -19,17 +19,14 @@ app.get('/db-check', async (req, res) => {
   }
 });
 
-// User registration
-app.post('/register', createUserHandler);
+// Register
+app.post('/auth/register', registerHandler);
 
-// User login
-app.post('/login', createAuthHandler);
+// Login
+app.post('/auth/login', createAuthHandler);
 
-// Get user by UID (protected)
-app.get('/user/:uid', authenticateJWT, getUserByIdHandler);
-
-// Delete user by UID (protected)
-app.delete('/user/:uid', authenticateJWT, deleteUserByIdHandler);
+// Get current user info
+app.get('/user/me', authenticateJWT, getMeHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

@@ -1,26 +1,17 @@
 import jwt from 'jsonwebtoken';
 
-// Middleware for JWT verification
 const authenticateJWT = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1];  // Get token from Authorization header (Bearer <token>)
-
+  const token = req.header('Authorization')?.split(' ')[1];
   if (!token) {
-    return res.status(401).json({
-      status_code: 401,
-      message: 'Token not found, please login first',
-    });
+    return res.status(401).json({ message: 'User Unauthorized, Please Login Again' });
   }
-
   try {
-    // Token verification
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.userId = decoded.uid;
+    req.userRole = decoded.role;
     next();
   } catch (err) {
-    return res.status(403).json({
-      status_code: 403,
-      message: 'Token invalid or expired',
-    });
+    return res.status(403).json({ message: 'Invalid User' });
   }
 };
 
