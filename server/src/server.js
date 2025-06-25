@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { registerHandler, createAuthHandler } from './server/auth.js';
+import { registerHandler, loginAuthHanlder } from './server/auth.js';
 import { getMeHandler } from './server/user.js';
 import { authenticateJWT } from './middleware.js';
 
@@ -23,7 +23,7 @@ app.get('/db-check', async (req, res) => {
 app.post('/auth/register', registerHandler);
 
 // Login
-app.post('/auth/login', createAuthHandler);
+app.post('/auth/login', loginAuthHanlder);
 
 // Get current user info
 app.get('/user/me', authenticateJWT, getMeHandler);

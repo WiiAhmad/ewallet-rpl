@@ -44,6 +44,11 @@ model Transaction {
 
 model Category {
   category_id Int      @id @default(autoincrement())
-  name        String   @unique
+  name        String   
   transactions Transaction[]
+}
+
+model Type {
+  type_id     Int     @id @default(autoincrement())
+  name        String  
 }

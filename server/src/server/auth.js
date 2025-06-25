@@ -36,7 +36,7 @@ async function registerHandler(req, res, next) {
 }
 
 // Login Handler
-async function createAuthHandler(req, res, next) {
+async function loginAuthHanlder(req, res, next) {
   const { email, password } = req.body;
   try {
     if (!email || !password) {
@@ -70,4 +70,4 @@ async function createAuthHandler(req, res, next) {
   }
 }
 
-export { registerHandler, createAuthHandler };
+export { registerHandler, loginAuthHanlder };
