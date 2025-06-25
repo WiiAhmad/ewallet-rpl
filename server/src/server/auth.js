@@ -63,7 +63,7 @@ async function loginAuthHanlder(req, res, next) {
         email: user.email,
         role: user.role
       },
-      tokens: `Bearer ${token}`
+      token: `Bearer ${token}`
     });
   } catch (err) {
     return next(err);

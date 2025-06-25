@@ -25,4 +25,13 @@ async function getMeHandler(req, res, next) {
   }
 }
 
+// Update user profile
+async function putUserHandler(req, res, next) {
+  try {
+
+  } catch (err) {
+    return next(err);
+  }
+}
+
 export { getMeHandler };
