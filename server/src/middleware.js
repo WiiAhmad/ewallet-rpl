@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 const authenticateJWT = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1];
+  const token = req.signedCookies.token;
   if (!token) {
     return res.status(401).json({ message: 'User Unauthorized, Please Login Again' });
   }

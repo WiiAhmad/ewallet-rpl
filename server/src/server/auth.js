@@ -55,6 +55,13 @@ async function loginAuthHanlder(req, res, next) {
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES }
     );
+    // Set JWT as a signed, httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      signed: true,
+      maxAge: 24 * 60 * 60 * 1000 // 1 day expiring time
+    });
     return res.status(200).json({
       message: 'Login successful',
       data: {
@@ -62,12 +69,25 @@ async function loginAuthHanlder(req, res, next) {
         name: user.name,
         email: user.email,
         role: user.role
-      },
-      token: `Bearer ${token}`
+      }
     });
   } catch (err) {
     return next(err);
   }
 }
 
-export { registerHandler, loginAuthHanlder };
+// Logout Handler
+async function logoutHandler(req, res, next) {
+  try {
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      signed: true
+    });
+    return res.status(204).json({});
+  } catch (err) {
+    return next(err);
+  }
+}
+
+export { registerHandler, loginAuthHanlder, logoutHandler };
