@@ -22,7 +22,9 @@ model User {
 model Wallet {
   wallet_id Int      @id @default(autoincrement())
   name      String
-  value     Float
+  number    String   @unique
+  balance   Float    @default(0)
+  desc      String?
   exp_date  DateTime?
   user      User     @relation(fields: [userId], references: [uid], onDelete: Cascade)
   userId    Int
