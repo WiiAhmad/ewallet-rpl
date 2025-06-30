@@ -3,6 +3,7 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { registerHandler, loginAuthHanlder } from './server/auth.js';
 import { getMeHandler } from './server/user.js';
+import { transferHandler, topupHandler, getTopupsHandler } from "./server/wallet.js";
 import { authenticateJWT } from './middleware.js';
 
 const prisma = new PrismaClient();
@@ -27,6 +28,15 @@ app.post('/auth/login', loginAuthHanlder);
 
 // Get current user info
 app.get('/user/me', authenticateJWT, getMeHandler);
+
+// Transfer Endpoint
+app.post("/wallets/transfer", authenticateJWT, transferHandler);
+
+//   USER   //
+app.post('/wallets/:id/topup', authenticateJWT, topupHandler);
+
+//   ADMIN  //
+app.get('/topups', authenticateJWT, getTopupsHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

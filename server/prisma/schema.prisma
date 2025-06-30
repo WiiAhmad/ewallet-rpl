@@ -8,47 +8,42 @@ datasource db {
 }
 
 model User {
-  uid       Int      @id @default(autoincrement())
-  name      String
-  phone     String?
-  email     String   @unique
-  password  String
-  address   String?
-  role      String   @default("User")
-  wallets   Wallet[]
+  uid          Int           @id @default(autoincrement())
+  name         String
+  phone        String?
+  email        String        @unique
+  password     String
+  address      String?
+  role         String        @default("User")
   transactions Transaction[]
+  wallets      Wallet[]
 }
 
 model Wallet {
-  wallet_id Int      @id @default(autoincrement())
-  name      String
-  value     Float
-  exp_date  DateTime?
-  user      User     @relation(fields: [userId], references: [uid], onDelete: Cascade)
-  userId    Int
+  wallet_id    Int           @id @default(autoincrement())
+  name         String
+  value        Float
+  exp_date     DateTime?
+  userId       Int
   transactions Transaction[]
+  user         User          @relation(fields: [userId], references: [uid], onDelete: Cascade)
 }
 
 model Transaction {
   trans_id    Int      @id @default(autoincrement())
-  user        User?    @relation(fields: [userId], references: [uid])
   userId      Int?
-  wallet      Wallet   @relation(fields: [wallet_id], references: [wallet_id], onDelete: Cascade)
   wallet_id   Int
   value       Float
-  category    Category @relation(fields: [category_id], references: [category_id])
   category_id Int
   description String
   date        DateTime
+  category    Category @relation(fields: [category_id], references: [category_id])
+  wallet      Wallet   @relation(fields: [wallet_id], references: [wallet_id], onDelete: Cascade)
+  user        User?    @relation(fields: [userId], references: [uid])
 }
 
 model Category {
-  category_id Int      @id @default(autoincrement())
-  name        String   
+  category_id  Int           @id @default(autoincrement())
+  name         String        @unique
   transactions Transaction[]
-}
-
-model Type {
-  type_id     Int     @id @default(autoincrement())
-  name        String  
 }
