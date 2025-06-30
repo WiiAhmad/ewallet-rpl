@@ -68,14 +68,14 @@ async function getWalletsHandler(req, res, next) {
 // Update user wallet by Id
 async function updateWalletHandler(req, res, next) {
     const uid = req.userId;
-    const id = parseInt(req.params.id, 10);
+    const walletId = parseInt(req.params.id, 10);
     const payload = req.body;
 
     try {
         // Check if wallet exists and belongs to the user
         const wallet = await prisma.wallet.findFirst({
         where: {
-            wallet_id: id,
+            wallet_id: walletId,
             user: { uid: uid }
         }
         });
@@ -103,4 +103,71 @@ async function updateWalletHandler(req, res, next) {
     }
 }
 
-export { createWalletHandler, getWalletsHandler, updateWalletHandler };
+// Delete user wallet by Id
+async function deleteWalletHandler(req, res, next) {
+    const uid = req.userId;
+    const walletId = parseInt(req.params.id, 10);
+
+    try {
+        // Check if wallet exists and belongs to the user
+        const wallet = await prisma.wallet.findFirst({
+        where: {
+            wallet_id: walletId,
+            user: { uid: uid }
+        }
+        });
+        if (!wallet) {
+            return res.status(404).json({ message: 'Wallet not found' });
+        }
+        const deleteWallet = await prisma.wallet.delete({
+            where: { wallet_id: id }
+        });
+        return res.status(200).json({
+            message: 'Wallet deleted successful',
+        });
+    } catch (err) {
+        return next(err);
+    }
+}
+
+// Get another user wallet info by wallet ID, including the owner username and email
+async function getOtherUserWalletHandler(req, res, next) {
+    const walletId = parseInt(req.params.id, 10);
+    try {
+        const wallet = await prisma.wallet.findUnique({
+            where: { wallet_id: walletId },
+            select: {
+                wallet_id: true,
+                name: true,
+                number: true,
+                balance: true,
+                desc: true,
+                user: {
+                    select: {
+                        name: true,
+                        email: true
+                    }
+                }
+            }
+        });
+        if (!wallet) {
+            return res.status(404).json({ message: 'Wallet not found' });
+        }
+        return res.status(200).json({
+            message: 'Wallet info fetched successfully',
+            data: {
+                id: wallet.user.uid,
+                name: wallet.name,
+                number: wallet.number,
+                owner: {
+                    name: wallet.user.name,
+                    email: wallet.user.email
+                }
+            }
+        });
+    } catch (err) {
+        return next(err);
+    }
+}
+
+export { createWalletHandler, getWalletsHandler, updateWalletHandler, deleteWalletHandler, getOtherUserWalletHandler };

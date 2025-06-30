@@ -6,7 +6,7 @@ import { PrismaClient } from '@prisma/client';
 import { registerHandler, loginAuthHanlder, logoutHandler } from './controllers/auth.js';
 import { getUserHandler, updateUserHandler } from './controllers/user.js';
 import { authenticateJWT } from './middleware.js';
-import { createWalletHandler, getWalletsHandler, updateWalletHandler } from './controllers/wallet.js';
+import { createWalletHandler, deleteWalletHandler, getOtherUserWalletHandler, getWalletsHandler, updateWalletHandler } from './controllers/wallet.js';
 
 const prisma = new PrismaClient();
 const app = express();
@@ -47,6 +47,12 @@ app.get('/wallets/me', authenticateJWT, getWalletsHandler)
 
 // Update wallet by id
 app.put('/wallets/:id', authenticateJWT, updateWalletHandler)
+
+// Delete wallet by id
+app.delete('/wallets/:id', authenticateJWT, deleteWalletHandler)
+
+// Get other user wallet
+app.get('/wallets/:id', authenticateJWT, getOtherUserWalletHandler)
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
