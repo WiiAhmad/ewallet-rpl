@@ -63,4 +63,16 @@ async function updateUserHandler(req, res, next) {
   }
 }
 
+async function getAllUsersHandler(req, res, next) {
+  
+}
+
+async function getUserWalletsHandler(req, res, next) {
+  
+}
+
+async function getAllUserTransactionsHandler(params) {
+  
+}
+
 export { getUserHandler, updateUserHandler };

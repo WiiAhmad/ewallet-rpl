@@ -3,9 +3,10 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { registerHandler, loginAuthHanlder, logoutHandler } from './server/auth.js';
-import { getUserHandler, updateUserHandler } from './server/user.js';
+import { registerHandler, loginAuthHanlder, logoutHandler } from './controllers/auth.js';
+import { getUserHandler, updateUserHandler } from './controllers/user.js';
 import { authenticateJWT } from './middleware.js';
+import { createWalletHandler, getWalletsHandler, updateWalletHandler } from './controllers/wallet.js';
 
 const prisma = new PrismaClient();
 const app = express();
@@ -37,6 +38,15 @@ app.get('/user/me', authenticateJWT, getUserHandler);
 
 // Update current user info
 app.put('/user/me', authenticateJWT, updateUserHandler);
+
+// Create wallet
+app.post('/wallets', authenticateJWT, createWalletHandler)
+
+// Get wallets
+app.get('/wallets/me', authenticateJWT, getWalletsHandler)
+
+// Update wallet by id
+app.put('/wallets/:id', authenticateJWT, updateWalletHandler)
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

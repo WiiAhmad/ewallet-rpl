@@ -19,6 +19,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "random-string-generator": "^1.0.7",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {

@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  User
+  Admin
+  Owner
+}
+
 model User {
   uid       Int      @id @default(autoincrement())
   name      String
@@ -14,9 +20,11 @@ model User {
   email     String   @unique
   password  String
   address   String?
-  role      String   @default("User")
+  role      Role     @default(User)
   wallets   Wallet[]
   transactions Transaction[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Wallet {
@@ -26,15 +34,17 @@ model Wallet {
   balance   Float    @default(0)
   desc      String?
   exp_date  DateTime?
-  user      User     @relation(fields: [userId], references: [uid], onDelete: Cascade)
-  userId    Int
+  user      User     @relation(fields: [uid], references: [uid], onDelete: Cascade)
+  uid    Int
   transactions Transaction[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Transaction {
   trans_id    Int      @id @default(autoincrement())
-  user        User?    @relation(fields: [userId], references: [uid])
-  userId      Int?
+  user        User?    @relation(fields: [uid], references: [uid])
+  uid      Int?
   wallet      Wallet   @relation(fields: [wallet_id], references: [wallet_id], onDelete: Cascade)
   wallet_id   Int
   value       Float
@@ -42,6 +52,10 @@ model Transaction {
   category_id Int
   description String
   date        DateTime
+  confirmed   Boolean   @default(false)
+  confirmedBy Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Category {
