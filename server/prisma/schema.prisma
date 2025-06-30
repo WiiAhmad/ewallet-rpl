@@ -14,83 +14,52 @@ enum Role {
 }
 
 model User {
-<<<<<<< HEAD
-  uid          Int           @id @default(autoincrement())
-  name         String
-  phone        String?
-  email        String        @unique
-  password     String
-  address      String?
-  role         String        @default("User")
-  transactions Transaction[]
-  wallets      Wallet[]
+  uid           Int           @id @default(autoincrement())
+  name          String
+  phone         String?
+  email         String        @unique
+  password      String
+  address       String?
+  role          Role          @default(User)
+  wallets       Wallet[]
+  transactions  Transaction[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 model Wallet {
-  wallet_id    Int           @id @default(autoincrement())
-  name         String
-  value        Float
-  exp_date     DateTime?
-  userId       Int
-  transactions Transaction[]
-  user         User          @relation(fields: [userId], references: [uid], onDelete: Cascade)
-=======
-  uid       Int      @id @default(autoincrement())
-  name      String
-  phone     String?
-  email     String   @unique
-  password  String
-  address   String?
-  role      Role     @default(User)
-  wallets   Wallet[]
-  transactions Transaction[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Wallet {
-  wallet_id Int      @id @default(autoincrement())
-  name      String
-  number    String   @unique
-  balance   Float    @default(0)
-  desc      String?
-  exp_date  DateTime?
-  user      User     @relation(fields: [uid], references: [uid], onDelete: Cascade)
-  uid    Int
-  transactions Transaction[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
->>>>>>> 03849c65d5c7613f2470523f768ad801a8055345
+  wallet_id     Int           @id @default(autoincrement())
+  name          String
+  number        String        @unique
+  balance       Float         @default(0)
+  desc          String?
+  exp_date      DateTime?
+  uid           Int
+  user          User          @relation(fields: [uid], references: [uid], onDelete: Cascade)
+  transactions  Transaction[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 model Transaction {
-  trans_id    Int      @id @default(autoincrement())
-<<<<<<< HEAD
-  userId      Int?
-=======
-  user        User?    @relation(fields: [uid], references: [uid])
-  uid      Int?
-  wallet      Wallet   @relation(fields: [wallet_id], references: [wallet_id], onDelete: Cascade)
->>>>>>> 03849c65d5c7613f2470523f768ad801a8055345
-  wallet_id   Int
-  value       Float
-  category_id Int
-  description String
-  date        DateTime
-<<<<<<< HEAD
-  category    Category @relation(fields: [category_id], references: [category_id])
-  wallet      Wallet   @relation(fields: [wallet_id], references: [wallet_id], onDelete: Cascade)
-  user        User?    @relation(fields: [userId], references: [uid])
-=======
-  confirmed   Boolean   @default(false)
-  confirmedBy Int?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
->>>>>>> 03849c65d5c7613f2470523f768ad801a8055345
+  trans_id      Int           @id @default(autoincrement())
+  uid           Int?
+  user          User?         @relation(fields: [uid], references: [uid])
+  wallet_id     Int
+  wallet        Wallet        @relation(fields: [wallet_id], references: [wallet_id], onDelete: Cascade)
+  value         Float
+  category_id   Int
+  category      Category      @relation(fields: [category_id], references: [category_id])
+  description   String
+  date          DateTime
+  confirmed     Boolean       @default(false)
+  confirmedBy   Int?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
 model Category {
-  category_id  Int           @id @default(autoincrement())
-  name         String        @unique
-  transactions Transaction[]
+  category_id   Int           @id @default(autoincrement())
+  name          String        @unique
+  transactions  Transaction[]
 }
