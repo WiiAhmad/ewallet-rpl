@@ -14,9 +14,12 @@
   "dependencies": {
     "@prisma/client": "^6.10.1",
     "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "random-string-generator": "^1.0.7",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {

@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 const authenticateJWT = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1];
+  const token = req.signedCookies.token;
   if (!token) {
     return res.status(401).json({ message: 'User Unauthorized, Please Login Again' });
   }
@@ -15,4 +15,13 @@ const authenticateJWT = (req, res, next) => {
   }
 };
 
-export { authenticateJWT };
+const requireRole = (roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).send('Access Dennied');
+    }
+    next();
+  };
+};
+
+export { authenticateJWT, requireRole};
