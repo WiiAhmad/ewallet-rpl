@@ -1,11 +1,11 @@
 {
   "name": "ewall-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "start": "node ./src/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node src/index.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +23,7 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
+    "cors": "^2.8.5",
     "prisma": "^6.10.1"
   }
 }
