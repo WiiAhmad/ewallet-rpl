@@ -3,13 +3,12 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { registerHandler, loginAuthHanlder } from './server/auth.js';
-import { getMeHandler } from './server/user.js';
-import { transferHandler, topupHandler, getTopupsHandler } from "./server/wallet.js";
 import { registerHandler, loginAuthHanlder, logoutHandler } from './controllers/auth.js';
 import { getUserHandler, updateUserHandler } from './controllers/user.js';
 import { authenticateJWT } from './middleware.js';
-import { createWalletHandler, deleteWalletHandler, getOtherUserWalletHandler, getWalletsHandler, updateWalletHandler } from './controllers/wallet.js';
+import { createWalletHandler, deleteWalletHandler, getOtherUserWalletHandler, getWalletsHandler, updateWalletHandler, transferHandler, requestTopupHandler, getAllTopupsHandler, approveTopupHandler } from './controllers/wallet.js';
+import { getTransactionHistoryHandler } from "./controllers/transaction.js";
+
 
 const prisma = new PrismaClient();
 const app = express();
@@ -57,14 +56,18 @@ app.delete('/wallets/:id', authenticateJWT, deleteWalletHandler)
 // Get other user wallet
 app.get('/wallets/:id', authenticateJWT, getOtherUserWalletHandler)
 
-// Transfer Endpoint
-app.post("/wallets/transfer", authenticateJWT, transferHandler);
+app.post('/wallets/transfer', authenticateJWT, transferHandler);
 
-//   USER   //
-app.post('/wallets/:id/topup', authenticateJWT, topupHandler);
+// Request top-up (user)
+app.post('/wallets/:id/topup', authenticateJWT, requestTopupHandler);
 
-//   ADMIN  //
-app.get('/topups', authenticateJWT, getTopupsHandler);
+// Get all top-up requests (admin only)
+app.get('/topups', authenticateJWT, getAllTopupsHandler);
+
+// Approve a top-up (admin only)
+app.post('/topups/:topup_id/approve', authenticateJWT, approveTopupHandler);
+
+app.get('/transactions', authenticateJWT, getTransactionHistoryHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

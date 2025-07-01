@@ -23,6 +23,7 @@ model User {
   role          Role          @default(User)
   wallets       Wallet[]
   transactions  Transaction[]
+  topups        Topup[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
@@ -37,6 +38,7 @@ model Wallet {
   uid           Int
   user          User          @relation(fields: [uid], references: [uid], onDelete: Cascade)
   transactions  Transaction[]
+  topups        Topup[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
@@ -62,4 +64,21 @@ model Category {
   category_id   Int           @id @default(autoincrement())
   name          String        @unique
   transactions  Transaction[]
+}
+
+model Topup {
+  topup_id      Int      @id @default(autoincrement())         // primary key
+  wallet_id     Int                                           // FK ke Wallet
+  wallet        Wallet   @relation(fields: [wallet_id], references: [wallet_id], onDelete: Cascade)
+  user_id       Int                                           // FK ke User (si pengaju)
+  user          User     @relation(fields: [user_id], references: [uid])
+  amount        Float
+  payment_method String
+  reference_id   String
+  status        String   @default("pending")   // pending | completed | rejected
+  requested_at  DateTime @default(now())
+  approved_by   Int?                          // admin UID
+  approved_at   DateTime?
+  admin_notes   String?
+
 }
