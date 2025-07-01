@@ -32,8 +32,15 @@ api.get('/db-check', async (req, res) => {
 api.post('/auth/register', registerHandler);
 api.post('/auth/login', loginAuthHanlder);
 api.post('/auth/logout', logoutHandler);
+
 api.get('/user/me', authenticateJWT, getUserHandler);
 api.put('/user/me', authenticateJWT, updateUserHandler);
+
+app.post('/wallets', authenticateJWT, createWalletHandler)
+app.get('/wallets/me', authenticateJWT, getWalletsHandler)
+app.put('/wallets/:id', authenticateJWT, updateWalletHandler)
+app.delete('/wallets/:id', authenticateJWT, deleteWalletHandler)
+app.get('/wallets/:id', authenticateJWT, getOtherUserWalletHandler)
 
 app.use('/api', api);
 
