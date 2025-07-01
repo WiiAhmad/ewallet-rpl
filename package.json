@@ -1,0 +1,27 @@
+{
+  "name": "ewallet-rpl",
+  "version": "1.0.0",
+  "description": "after clonning repo",
+  "scripts": {
+    "dev:client" : "cd client && npm run dev",
+    "dev:server" : "cd server && npm run dev",
+    "install:client" : "cd client && npm i",
+    "install:server" : "cd server && npm i",
+    "dev" : "concurrently \"npm run dev:client\" \"npm run dev:server\" ",
+    "all" : "concurrently \"npm run install:client\" \"npm run install:server\" ",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WiiAhmad/ewallet-rpl.git"
+  },
+  "author": "wiiahmad",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WiiAhmad/ewallet-rpl/issues"
+  },
+  "homepage": "https://github.com/WiiAhmad/ewallet-rpl#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}
