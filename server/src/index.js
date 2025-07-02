@@ -5,9 +5,10 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { registerHandler, loginAuthHanlder, logoutHandler } from './controllers/auth.js';
 import { getUserHandler, updateUserHandler } from './controllers/user.js';
-import { createWalletHandler, getWalletsHandler, updateWalletHandler, deleteWalletHandler, getOtherUserWalletHandler } from './controllers/wallet.js'
 import { authenticateJWT } from './middleware.js';
 import cors from 'cors';
+import { createWalletHandler, deleteWalletHandler, getOtherUserWalletHandler, getWalletsHandler, updateWalletHandler, transferHandler, requestTopupHandler, getAllTopupsHandler, approveTopupHandler } from './controllers/wallet.js';
+import { getTransactionHistoryHandler } from "./controllers/transaction.js";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -44,6 +45,18 @@ app.delete('/wallets/:id', authenticateJWT, deleteWalletHandler)
 app.get('/wallets/:id', authenticateJWT, getOtherUserWalletHandler)
 
 app.use('/api', api);
+app.post('/wallets/transfer', authenticateJWT, transferHandler);
+
+// Request top-up (user)
+app.post('/wallets/:id/topup', authenticateJWT, requestTopupHandler);
+
+// Get all top-up requests (admin only)
+app.get('/topups', authenticateJWT, getAllTopupsHandler);
+
+// Approve a top-up (admin only)
+app.post('/topups/:topup_id/approve', authenticateJWT, approveTopupHandler);
+
+app.get('/transactions', authenticateJWT, getTransactionHistoryHandler);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
