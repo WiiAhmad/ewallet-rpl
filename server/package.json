@@ -1,16 +1,29 @@
 {
-  "name": "server",
+  "name": "ewall-api",
   "version": "1.0.0",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev" : "node src/index.js"
+    "dev": "node src/index.js"
   },
-  "author": "wiiahmad",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^5.1.0"
+    "@prisma/client": "^6.10.1",
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "random-string-generator": "^1.0.7",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "cors": "^2.8.5",
+    "prisma": "^6.10.1"
   }
 }

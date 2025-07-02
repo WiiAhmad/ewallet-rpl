@@ -23,6 +23,8 @@ server/dist
 server/dist-ssr
 server/*.local
 server/.env
+server/database/*.db
+server/generated/prisma
 
 # Editor directories and files
 .vscode/*
