@@ -1,5 +1,3 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import random from 'random-string-generator';
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
