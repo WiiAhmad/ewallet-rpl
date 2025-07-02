@@ -3,8 +3,9 @@ import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { registerHandler, loginAuthHanlder, logoutHandler } from './server/auth.js';
-import { getUserHandler, updateUserHandler } from './server/user.js';
+import { registerHandler, loginAuthHanlder, logoutHandler } from './controllers/auth.js';
+import { getUserHandler, updateUserHandler } from './controllers/user.js';
+import { createWalletHandler, getWalletsHandler, updateWalletHandler, deleteWalletHandler, getOtherUserWalletHandler } from './controllers/wallet.js'
 import { authenticateJWT } from './middleware.js';
 import cors from 'cors';
 
@@ -20,7 +21,7 @@ app.use(cors({
   credentials: true
 }));
 
-api.get('/db-check', async (req, res) => {
+app.get('/db-check', async (req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
     res.json({ connected: true });
@@ -29,12 +30,12 @@ api.get('/db-check', async (req, res) => {
   }
 });
 
-api.post('/auth/register', registerHandler);
-api.post('/auth/login', loginAuthHanlder);
-api.post('/auth/logout', logoutHandler);
+app.post('/auth/register', registerHandler);
+app.post('/auth/login', loginAuthHanlder);
+app.post('/auth/logout', logoutHandler);
 
-api.get('/user/me', authenticateJWT, getUserHandler);
-api.put('/user/me', authenticateJWT, updateUserHandler);
+app.get('/user/me', authenticateJWT, getUserHandler);
+app.put('/user/me', authenticateJWT, updateUserHandler);
 
 app.post('/wallets', authenticateJWT, createWalletHandler)
 app.get('/wallets/me', authenticateJWT, getWalletsHandler)
