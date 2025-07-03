@@ -84,7 +84,7 @@ async function updateWalletHandler(req, res, next) {
         if (payload.name) updateData.name = payload.name;
         if (payload.desc) updateData.desc = payload.desc;
         const updatedWallet = await prisma.wallet.update({
-        where: { wallet_id: id },
+        where: { wallet_id: walletId },
         data: updateData,
         });
         return res.status(200).json({
@@ -118,7 +118,7 @@ async function deleteWalletHandler(req, res, next) {
             return res.status(404).json({ message: 'Wallet not found' });
         }
         const deleteWallet = await prisma.wallet.delete({
-            where: { wallet_id: id }
+            where: { wallet_id: walletId }
         });
         return res.status(200).json({
             message: 'Wallet deleted successful',
