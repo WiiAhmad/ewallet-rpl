@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import random from 'random-string-generator';
 const prisma = new PrismaClient();
 
 // Register Handler
@@ -18,8 +19,20 @@ async function registerHandler(req, res, next) {
       return res.status(400).json({ message: 'Email already in use' });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
+    // Always create with role User
     const user = await prisma.user.create({
-      data: { name, phone, email, password: hashedPassword }
+      data: { name, phone, email, password: hashedPassword, role: 'User' }
+    });
+    // Create default Main wallet (non-deletable)
+    const mainWalletNumber = random(8, 'uppernumeric');
+    await prisma.wallet.create({
+      data: {
+        name: 'Main',
+        number: mainWalletNumber,
+        desc: 'Default main wallet',
+        uid: user.uid,
+        // Optionally add a flag here if you add it to schema, e.g. isMain: true
+      }
     });
     return res.status(201).json({
       message: 'User registered successfully',

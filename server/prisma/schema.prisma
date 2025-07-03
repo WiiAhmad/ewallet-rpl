@@ -43,7 +43,7 @@ model Transaction {
   uid           Int?
   user          User?         @relation(fields: [uid], references: [uid])
   wallet_id     Int
-  wallet        Wallet        @relation(fields: [wallet_id], references: [wallet_id], onDelete: Cascade)
+  wallet        Wallet        @relation(fields: [wallet_id], references: [wallet_id], onDelete: NoAction)
   amount        Float         
   type_id       Int
   type          Type          @relation(fields: [type_id], references: [type_id])
@@ -71,7 +71,7 @@ model Topup {
   status         String    @default("Pending")   // Pending | Completed | Rejected
   requested_at   DateTime  @default(now())
   approved       User?     @relation("TopupApprovedBy",fields: [approved_by], references: [uid])
-  approved_by    Int                             // Admin UID
+  approved_by    Int?                             // Admin UID
   approved_at    DateTime?
   admin_notes    String?
 }

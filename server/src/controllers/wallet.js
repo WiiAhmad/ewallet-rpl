@@ -2,172 +2,175 @@ import random from 'random-string-generator';
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-// Create user wallet
+// Buat Wallet baru
 async function createWalletHandler(req, res, next) {
-    const id = req.userId;
-    const { name, desc } = req.body;
-    const number = random(8, 'uppernumeric');
-    try {
-        const user = await prisma.user.findUnique({
-        where: { uid: id },
-        });
-        if (!user) {
-            return res.status(404).json({ message: 'Invalid User' });
-        }
-        if (!name) {
-             return res.status(400).json({ message: 'Name must not blank, etc' });
-        }
-        const wallet = await prisma.wallet.create({
-        data: { name, number, desc, user: { connect: { uid: id } } }
-        });
-        return res.status(201).json({
-        message: 'Wallet successfully created',
-        data: {
-            id: wallet.wallet_id,
-            name: wallet.name,
-            number: wallet.number,
-            balance: wallet.balance,
-            desc: wallet.desc
-        }
-        });
-    } catch (err) {
-        return next(err);
+  const id = req.userId;
+  const { name, desc } = req.body;
+  const number = random(8, 'uppernumeric');
+  try {
+    const user = await prisma.user.findUnique({
+      where: { uid: id },
+    });
+    if (!user) {
+      return res.status(404).json({ message: 'Invalid User' });
     }
+    if (!name) {
+      return res.status(400).json({ message: 'Name must not blank, etc' });
+    }
+    const wallet = await prisma.wallet.create({
+      data: { name, number, desc, user: { connect: { uid: id } } }
+    });
+    return res.status(201).json({
+      message: 'Wallet successfully created',
+      data: {
+        id: wallet.wallet_id,
+        name: wallet.name,
+        number: wallet.number,
+        balance: wallet.balance,
+        desc: wallet.desc
+    }
+    });
+  } catch (err) {
+    return next(err);
+  }
 }
 
-// Get user wallets
+// Ambil Wallet yg dimiliki
 async function getWalletsHandler(req, res, next) {
-    try {
-        const user = await prisma.user.findUnique({
-        where: { uid: req.userId },
-        });
-        if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-        }
-        const wallets = await prisma.wallet.findMany({
-        where: { user: { uid: user.uid } },
-        select: {
-            wallet_id: true,
-            name: true,
-            number: true,
-            balance: true,
-            desc: true
-        }
-        });
-        return res.status(200).json({
-        message: 'Wallets fetched successfully',
-        data: wallets
-        });
-    } catch (err) {
-        return next(err);
+  try {
+    const user = await prisma.user.findUnique({
+      where: { uid: req.userId },
+    });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
+    const wallets = await prisma.wallet.findMany({
+      where: { user: { uid: user.uid } },
+      select: {
+        wallet_id: true,
+        name: true,
+        number: true,
+        balance: true,
+        desc: true
+      }
+    });
+    return res.status(200).json({
+      message: 'Wallets fetched successfully',
+      data: wallets
+    });
+  } catch (err) {
+    return next(err);
+  }
 }
 
-// Update user wallet by Id
+// Update Wallet pengguna berdasarkan id
 async function updateWalletHandler(req, res, next) {
-    const uid = req.userId;
-    const walletId = parseInt(req.params.id, 10);
-    const payload = req.body;
+  const uid = req.userId;
+  const walletId = parseInt(req.params.id, 10);
+  const payload = req.body;
 
-    try {
-        // Check if wallet exists and belongs to the user
-        const wallet = await prisma.wallet.findFirst({
-        where: {
-            wallet_id: walletId,
-            user: { uid: uid }
-        }
-        });
-        if (!wallet) {
-        return res.status(404).json({ message: 'Wallet not found' });
-        }
-        const updateData = {};
-        if (payload.name) updateData.name = payload.name;
-        if (payload.desc) updateData.desc = payload.desc;
-        const updatedWallet = await prisma.wallet.update({
-        where: { wallet_id: walletId },
-        data: updateData,
-        });
-        return res.status(200).json({
-        message: 'Wallet update successful',
-        data: {
-            id: updatedWallet.wallet_id,
-            name: updatedWallet.name,
-            number: updatedWallet.number,
-            desc: updatedWallet.desc,
-        },
-        });
-    } catch (err) {
-        return next(err);
+  try {
+    // Cek apakah wallet milik pengguna
+    const wallet = await prisma.wallet.findFirst({
+      where: {
+        wallet_id: walletId,
+        user: { uid: uid }
+      }
+    });
+    if (!wallet) {
+      return res.status(404).json({ message: 'Wallet not found' });
     }
+    const updateData = {};
+    if (payload.name) updateData.name = payload.name;
+    if (payload.desc) updateData.desc = payload.desc;
+    const updatedWallet = await prisma.wallet.update({
+      where: { wallet_id: walletId },
+      data: updateData,
+    });
+    return res.status(200).json({
+      message: 'Wallet update successful',
+      data: {
+        id: updatedWallet.wallet_id,
+        name: updatedWallet.name,
+        number: updatedWallet.number,
+        desc: updatedWallet.desc,
+      },
+    });
+  } catch (err) {
+    return next(err);
+  }
 }
 
-// Delete user wallet by Id
+// Hapus wallet berdasarkan id
 async function deleteWalletHandler(req, res, next) {
-    const uid = req.userId;
-    const walletId = parseInt(req.params.id, 10);
+  const uid = req.userId;
+  const walletId = parseInt(req.params.id, 10);
 
-    try {
-        // Check if wallet exists and belongs to the user
-        const wallet = await prisma.wallet.findFirst({
-        where: {
-            wallet_id: walletId,
-            user: { uid: uid }
-        }
-        });
-        if (!wallet) {
-            return res.status(404).json({ message: 'Wallet not found' });
-        }
-        const deleteWallet = await prisma.wallet.delete({
-            where: { wallet_id: walletId }
-        });
-        return res.status(200).json({
-            message: 'Wallet deleted successful',
-        });
-    } catch (err) {
-        return next(err);
+  try {
+    // Cek apakah wallet milik pengguna
+    const wallet = await prisma.wallet.findFirst({
+      where: {
+        wallet_id: walletId,
+        user: { uid: uid }
+      }
+    });
+    if (!wallet) {
+      return res.status(404).json({ message: 'Wallet not found' });
     }
+    // Mencegah wallet main untuk dihapus
+    if (wallet.name === 'Main') {
+      return res.status(403).json({ message: 'Main wallet cannot be deleted' });
+    }
+    const deleteWallet = await prisma.wallet.delete({
+      where: { wallet_id: walletId }
+    });
+    return res.status(200).json({
+      message: 'Wallet deleted successful',
+    });
+  } catch (err) {
+    return next(err);
+  }
 }
 
-// Get another user wallet info by wallet ID, including the owner username and email
+// Get another user wallet info by wallet number, including the owner username and email
 async function getOtherUserWalletHandler(req, res, next) {
-    const walletId = parseInt(req.params.id, 10);
-    try {
-        const wallet = await prisma.wallet.findUnique({
-            where: { wallet_id: walletId },
-            select: {
-                wallet_id: true,
-                name: true,
-                number: true,
-                balance: true,
-                desc: true,
-                user: {
-                    select: {
-                        name: true,
-                        email: true
-                    }
-                }
-            }
-        });
-        if (!wallet) {
-            return res.status(404).json({ message: 'Wallet not found' });
+  const walletNum = req.params.wallet_number;
+  try {
+    const wallet = await prisma.wallet.findUnique({
+      where: { number: walletNum },
+      select: {
+        name: true,
+        number: true,
+        balance: true,
+        desc: true,
+        user: {
+          select: {
+            uid: true,
+            name: true,
+            email: true
+          }
         }
-        return res.status(200).json({
-            message: 'Wallet info fetched successfully',
-            data: {
-                id: wallet.user.uid,
-                name: wallet.name,
-                number: wallet.number,
-                owner: {
-                    name: wallet.user.name,
-                    email: wallet.user.email
-                }
-            }
-        });
-    } catch (err) {
-        return next(err);
+      }
+    });
+    if (!wallet) {
+      return res.status(404).json({ message: 'Wallet not found' });
     }
+    return res.status(200).json({
+      message: 'Wallet info fetched successfully',
+      data: {
+        id: wallet.user.uid,
+        name: wallet.name,
+        number: wallet.number,
+        owner: {
+          name: wallet.user.name,
+          email: wallet.user.email
+        }
+      }
+    });
+  } catch (err) {
+    return next(err);
+  }
 }
-
 
 // Handler untuk transfer saldo antar wallet
 async function transferHandler(req, res, next) {
@@ -245,51 +248,49 @@ async function transferHandler(req, res, next) {
     }
 }  
 
-
+// Handler untuk request Topup Wallet dengan wallet_number sebagai parameter URL
 async function requestTopupHandler(req, res, next) {
   const userId = req.userId;
-  const walletId = parseInt(req.params.id);
+  const wallet_number = req.params.wallet_number;
   const { amount, payment_method, reference_id } = req.body;
 
-  // Validasi input
-  if (!amount || amount < 10000) {
-    return res.status(400).json({
-      message: "Invalid input provided.",
-      errors: { amount: "Amount must be greater than 10000" },
-    });
-  }
-
   try {
-    // Cek wallet apakah dimiliki user
-    const wallet = await prisma.wallet.findFirst({
-      where: {
-        wallet_id: walletId,
-        uid: userId,
-      },
-    });
-
-    if (!wallet) {
-      return res
-        .status(404)
-        .json({ message: "Wallet with the specified ID not found." });
+    // Validasi input
+    if (!wallet_number || !amount || !payment_method || !reference_id) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+    if (amount <= 0) {
+      return res.status(400).json({ message: 'Amount must be greater than 0' });
     }
 
-    // Buat data topup
+    // Cari wallet berdasarkan number dan pastikan milik user
+    const wallet = await prisma.wallet.findFirst({
+      where: {
+        number: wallet_number,
+        user: { uid: userId },
+      },
+    });
+    if (!wallet) {
+      return res.status(404).json({ message: 'Wallet not found or access denied' });
+    }
+
+    // Buat request topup
     const topup = await prisma.topup.create({
       data: {
-        wallet_id: walletId,
-        user_id: userId,
+        wallet: { connect: { wallet_id: wallet.wallet_id } },
+        user: { connect: { uid: userId } },
         amount,
         payment_method,
         reference_id,
+        status: 'pending',
       },
     });
 
-    return res.status(202).json({
-      message: "Top-up request received and is pending approval.",
+    return res.status(201).json({
+      message: 'Topup request created successfully',
       data: {
         topup_id: topup.topup_id,
-        wallet_id: wallet.number,
+        wallet_id: topup.wallet_id,
         amount: topup.amount,
         status: topup.status,
         requested_at: topup.requested_at,
@@ -410,4 +411,21 @@ async function approveTopupHandler(req, res, next) {
 }
   
 
-export { createWalletHandler, getWalletsHandler, updateWalletHandler, deleteWalletHandler, getOtherUserWalletHandler, transferHandler, requestTopupHandler, getAllTopupsHandler, approveTopupHandler };
+// Get all wallets from every user (Admin/Owner only)
+async function getAllWalletsHandler(req, res, next) {
+  try {
+    if (!["Admin", "Owner"].includes(req.userRole)) {
+      return res.status(403).json({ message: "Access Denied" });
+    }
+    const wallets = await prisma.wallet.findMany({
+      include: {
+        user: { select: { uid: true, name: true, email: true, role: true } }
+      }
+    });
+    return res.status(200).json({ message: 'All wallets', data: wallets });
+  } catch (err) {
+    return next(err);
+  }
+}
+
+export { createWalletHandler, getWalletsHandler, updateWalletHandler, deleteWalletHandler, getOtherUserWalletHandler, transferHandler, requestTopupHandler, getAllTopupsHandler, approveTopupHandler, getAllWalletsHandler };
