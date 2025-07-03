@@ -30,7 +30,7 @@ const getTransactionHistoryHandler = async (req, res, next) => {
 
     if (category) {
       // Jika category berupa ID atau nama kategori
-      whereClause.category = {
+      whereClause.type = {
         name: category, // atau pakai ID kalau pakai angka
       };
     }
@@ -42,7 +42,7 @@ const getTransactionHistoryHandler = async (req, res, next) => {
     const transactions = await prisma.transaction.findMany({
       where: whereClause,
       include: {
-        category: true,
+        type: true,
         wallet: true,
       },
       orderBy: {
@@ -55,10 +55,10 @@ const getTransactionHistoryHandler = async (req, res, next) => {
     // Format hasil
     const formattedData = transactions.map((tx) => ({
       id: `txn_${tx.trans_id}`,
-      type: tx.value < 0 ? "debit" : "credit",
-      amount: Math.abs(tx.value),
+      type: tx.type?.name || (tx.amount < 0 ? "Debit" : "Credit"),
+      amount: Math.abs(tx.amount),
       description: tx.description,
-      status: tx.confirmed ? "completed" : "pending",
+      status: tx.confirmed ? "Completed" : "Pending",
       created_at: tx.date,
     }));
 
@@ -76,7 +76,6 @@ const getTransactionHistoryHandler = async (req, res, next) => {
     return next(err);
   }
 };
-
 // Get all transactions in the app (Admin/Owner only)
 async function getAllTransactionsHandler(req, res, next) {
   try {

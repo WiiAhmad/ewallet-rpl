@@ -213,19 +213,46 @@ async function transferHandler(req, res, next) {
       if (!toWallet) {
         return res.status(404).json({ message: "Receiver wallet not found" });
       }
-  
+      
       // Jalankan transaksi saldo
       const updatedSender = await prisma.wallet.update({
         where: { wallet_id: fromWallet.wallet_id },
         data: { balance: { decrement: amount } },
       });
-  
+      
       const updatedReceiver = await prisma.wallet.update({
         where: { wallet_id: toWallet.wallet_id },
         data: { balance: { increment: amount } },
       });
-  
-      // Optional: simpan log transaksi di database (kalau pakai model Transaction)
+      
+      // Simpan log transaksi di database
+      const [debitType, creditType] = await Promise.all([
+        prisma.type.findUnique({ where: { name: "Debit" } }),
+        prisma.type.findUnique({ where: { name: "Credit" } }),
+      ]);
+      
+      await prisma.transaction.createMany({
+        data: [
+          {
+            uid: userId,
+            wallet_id: fromWallet.wallet_id,
+            amount: -amount,
+            type_id: debitType?.type_id,
+            description: note || `Transfer to ${toWallet.number}`,
+            date: new Date(),
+            confirmed: true,
+          },
+          {
+            uid: toWallet.user.uid,
+            wallet_id: toWallet.wallet_id,
+            amount: amount,
+            type_id: creditType?.type_id,
+            description: note || `Received from ${fromWallet.number}`,
+            date: new Date(),
+            confirmed: true,
+          },
+        ],
+      });
   
       // Kirim response ke frontend
       return res.status(200).json({
@@ -257,10 +284,10 @@ async function requestTopupHandler(req, res, next) {
   try {
     // Validasi input
     if (!wallet_number || !amount || !payment_method || !reference_id) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({ message: "Missing required fields" });
     }
-    if (amount <= 0) {
-      return res.status(400).json({ message: 'Amount must be greater than 0' });
+    if (amount < 10000) {
+      return res.status(400).json({ message: "Amount must be greater than 10000" });
     }
 
     // Cari wallet berdasarkan number dan pastikan milik user
@@ -271,7 +298,7 @@ async function requestTopupHandler(req, res, next) {
       },
     });
     if (!wallet) {
-      return res.status(404).json({ message: 'Wallet not found or access denied' });
+      return res.status(404).json({ message: "Wallet not found or access denied" });
     }
 
     // Buat request topup
@@ -282,12 +309,12 @@ async function requestTopupHandler(req, res, next) {
         amount,
         payment_method,
         reference_id,
-        status: 'pending',
+        status: "Pending",
       },
     });
 
     return res.status(201).json({
-      message: 'Topup request created successfully',
+      message: "Topup request created successfully",
       data: {
         topup_id: topup.topup_id,
         wallet_id: topup.wallet_id,
@@ -301,7 +328,7 @@ async function requestTopupHandler(req, res, next) {
   }
 }
 
-// Handler 2: Admin melihat semua request topup
+// Handler Admin melihat semua request topup
 async function getAllTopupsHandler(req, res, next) {
   const { status, page = 1, limit = 10 } = req.query;
   const skip = (page - 1) * limit;
@@ -349,7 +376,7 @@ async function getAllTopupsHandler(req, res, next) {
   }
 }
 
-// Handler 3: Admin menyetujui topup
+// Handler Admin menyetujui topup
 async function approveTopupHandler(req, res, next) {
   const topupId = parseInt(req.params.topup_id);
   const adminId = req.userId;
@@ -364,12 +391,12 @@ async function approveTopupHandler(req, res, next) {
     if (!topup) {
       return res
         .status(404)
-        .json({ message: "topup_id with the specified ID not found." });
+        .json({ message: "Topup with the specified id not found." });
     }
 
-    if (topup.status !== "pending") {
+    if (topup.status !== "Pending") {
       return res.status(422).json({
-        message: "This top-up request cannot be processed.",
+        message: "This topup request cannot be processed.",
         details: "The request has already been completed or rejected.",
       });
     }
@@ -379,7 +406,7 @@ async function approveTopupHandler(req, res, next) {
       prisma.topup.update({
         where: { topup_id: topupId },
         data: {
-          status: "completed",
+          status: "Completed",
           approved_by: adminId,
           approved_at: new Date(),
           admin_notes,
@@ -399,7 +426,7 @@ async function approveTopupHandler(req, res, next) {
         topup_id: topup.topup_id,
         wallet_id: topup.wallet.number,
         amount: topup.amount,
-        status: "completed",
+        status: "Completed",
         approved_by: adminId,
         approved_at: new Date(),
         updated_wallet_balance: updated[1].balance,
@@ -411,7 +438,7 @@ async function approveTopupHandler(req, res, next) {
 }
   
 
-// Get all wallets from every user (Admin/Owner only)
+// Mendapat semua data Wallet
 async function getAllWalletsHandler(req, res, next) {
   try {
     if (!["Admin", "Owner"].includes(req.userRole)) {
