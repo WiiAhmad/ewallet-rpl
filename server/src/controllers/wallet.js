@@ -240,7 +240,6 @@ async function transferHandler(req, res, next) {
             type_id: debitType?.type_id,
             description: note || `Transfer to ${toWallet.number}`,
             date: new Date(),
-            confirmed: true,
           },
           {
             uid: toWallet.user.uid,
@@ -249,7 +248,6 @@ async function transferHandler(req, res, next) {
             type_id: creditType?.type_id,
             description: note || `Received from ${fromWallet.number}`,
             date: new Date(),
-            confirmed: true,
           },
         ],
       });
@@ -258,7 +256,7 @@ async function transferHandler(req, res, next) {
       return res.status(200).json({
         message: "Transfer successful",
         data: {
-          transaction_id: `txn_${Date.now()}`, // sementara pakai timestamp
+          transaction_id: `txn_${Date.now()}`,
           from_wallet: {
             number: fromWallet.number,
             new_balance: updatedSender.balance,

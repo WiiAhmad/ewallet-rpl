@@ -58,7 +58,7 @@ const getTransactionHistoryHandler = async (req, res, next) => {
       type: tx.type?.name || (tx.amount < 0 ? "Debit" : "Credit"),
       amount: Math.abs(tx.amount),
       description: tx.description,
-      status: tx.confirmed ? "Completed" : "Pending",
+      status: "Completed",
       created_at: tx.date,
     }));
 
