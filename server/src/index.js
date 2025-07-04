@@ -7,7 +7,7 @@ import { registerHandler, loginAuthHanlder, logoutHandler } from './controllers/
 import { getUserHandler, updateUserHandler, getAllUsersHandler } from './controllers/user.js';
 import { authenticateJWT, requireRole } from './middleware.js';
 import cors from 'cors';
-import { createWalletHandler, deleteWalletHandler, getOtherUserWalletHandler, getWalletsHandler, updateWalletHandler, transferHandler, requestTopupHandler, getAllTopupsHandler, approveTopupHandler, getAllWalletsHandler } from './controllers/wallet.js';
+import { createWalletHandler, deleteWalletHandler, getOtherUserWalletHandler, getWalletsHandler, updateWalletHandler, transferHandler, requestTopupHandler, getAllTopupsHandler, approveTopupHandler, getAllWalletsHandler, getUserTopupHistoryHandler } from './controllers/wallet.js';
 import { getTransactionHistoryHandler, getAllTransactionsHandler } from "./controllers/transaction.js";
 
 const prisma = new PrismaClient();
@@ -51,7 +51,8 @@ app.get('/wallets/:wallet_number', authenticateJWT, getOtherUserWalletHandler)
 app.post('/wallets/transfer', authenticateJWT, transferHandler);
 app.post('/wallets/:wallet_number/topup', authenticateJWT, requestTopupHandler);
 
-// User Transactions
+// User History
+app.get('/topups', authenticateJWT, getUserTopupHistoryHandler);
 app.get('/transactions', authenticateJWT, getTransactionHistoryHandler);
 
 // Admin, Owner endpoints

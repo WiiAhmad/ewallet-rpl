@@ -48,7 +48,8 @@ model Transaction {
   type_id       Int
   type          Type          @relation(fields: [type_id], references: [type_id])
   description   String        
-  date          DateTime            
+  date          DateTime 
+  detail        String?           
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }

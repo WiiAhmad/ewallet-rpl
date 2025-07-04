@@ -121,6 +121,11 @@ async function deleteWalletHandler(req, res, next) {
     if (wallet.name === 'Main') {
       return res.status(403).json({ message: 'Main wallet cannot be deleted' });
     }
+
+    if (wallet.balance > 0) {
+      return res.status(403).json({ message: 'Cannot delete wallet with non-zero balance' });
+    }
+
     const deleteWallet = await prisma.wallet.delete({
       where: { wallet_id: walletId }
     });
@@ -326,6 +331,55 @@ async function requestTopupHandler(req, res, next) {
   }
 }
 
+// Handler untuk menampilkan riwayat topup milik user yang sedang login
+async function getUserTopupHistoryHandler(req, res, next) {
+  const userId = req.userId;
+  const { status, page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
+
+  try {
+    const whereClause = { user_id: userId };
+    if (status) whereClause.status = status;
+
+    const [topups, total] = await Promise.all([
+      prisma.topup.findMany({
+        where: whereClause,
+        skip: parseInt(skip),
+        take: parseInt(limit),
+        orderBy: { requested_at: "desc" },
+        include: {
+          wallet: { select: { wallet_id: true, name: true, number: true } },
+        },
+      }),
+      prisma.topup.count({ where: whereClause }),
+    ]);
+
+    return res.status(200).json({
+      message: "Top-up history retrieved successfully",
+      data: topups.map((t) => ({
+        topup_id: t.topup_id,
+        wallet: t.wallet,
+        amount: t.amount,
+        status: t.status,
+        requested_at: t.requested_at,
+        approved_by: t.approved_by,
+        approved_at: t.approved_at,
+        admin_notes: t.admin_notes,
+        payment_method: t.payment_method,
+        reference_id: t.reference_id,
+      })),
+      pagination: {
+        current_page: parseInt(page),
+        total_pages: Math.ceil(total / limit),
+        total_items: total,
+        items_per_page: parseInt(limit),
+      },
+    });
+  } catch (err) {
+    return next(err);
+  }
+}
+
 // Handler Admin melihat semua request topup
 async function getAllTopupsHandler(req, res, next) {
   const { status, page = 1, limit = 10 } = req.query;
@@ -453,4 +507,4 @@ async function getAllWalletsHandler(req, res, next) {
   }
 }
 
-export { createWalletHandler, getWalletsHandler, updateWalletHandler, deleteWalletHandler, getOtherUserWalletHandler, transferHandler, requestTopupHandler, getAllTopupsHandler, approveTopupHandler, getAllWalletsHandler };
+export { createWalletHandler, getWalletsHandler, updateWalletHandler, deleteWalletHandler, getOtherUserWalletHandler, transferHandler, requestTopupHandler, getUserTopupHistoryHandler, getAllTopupsHandler, approveTopupHandler, getAllWalletsHandler };
