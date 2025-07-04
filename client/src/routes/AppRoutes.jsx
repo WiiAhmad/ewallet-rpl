@@ -14,7 +14,8 @@ import WalletCreatePage from "../pages/User/WalletCreatePage";
 import WalletEditPage from "../pages/User/WalletEditPage";
 import TopUpPage from "../pages/User/TopUpPage";
 import TransactionHistoryPage from "../pages/User/TransactionHistoryPage";
-import TransferPage from "../pages/User/TransferPage"; // <-- Import halaman baru
+import TransferPage from "../pages/User/TransferPage";
+import MoveMoneyPage from "../pages/User/MoveMoneyPage"; // <-- Import halaman baru
 
 const AppRoutes = () => {
   const { user } = useAuth();
@@ -50,8 +51,8 @@ const AppRoutes = () => {
           <Route path="/wallets/:walletId/edit" element={<WalletEditPage />} />
           <Route path="/topup" element={<TopUpPage />} />
           <Route path="/history" element={<TransactionHistoryPage />} />
-          <Route path="/transfer" element={<TransferPage />} />{" "}
-          {/* <-- Tambahkan rute kirim uang */}
+          <Route path="/transfer" element={<TransferPage />} />
+          <Route path="/move" element={<MoveMoneyPage />} />{" "}
         </Route>
       </Route>
 

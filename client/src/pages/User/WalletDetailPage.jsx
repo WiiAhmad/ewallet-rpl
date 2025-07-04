@@ -79,7 +79,7 @@ const WalletDetailPage = () => {
             <span className="text-xs font-semibold mt-1">Top Up</span>
           </Link>
           <Link
-            to={`/transfer?from=${wallet.number}`}
+            to={`/transfer`}
             className="flex flex-col items-center text-gray-600 hover:text-green-600 p-2 rounded-lg border border-gray-300"
           >
             <span className="text-xl">💸</span>
