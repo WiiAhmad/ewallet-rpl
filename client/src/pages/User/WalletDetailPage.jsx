@@ -12,7 +12,6 @@ const WalletDetailPage = () => {
   const fetchWalletDetails = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Ambil semua wallet dan filter berdasarkan ID dari parameter URL
       const response = await api.get("/wallets/me");
       const foundWallet = response.data.data.find(
         (w) => w.wallet_id === parseInt(walletId)
@@ -62,7 +61,7 @@ const WalletDetailPage = () => {
   }
 
   if (!wallet) {
-    return null; // Akan diredirect oleh logic di fetchWalletDetails
+    return null;
   }
 
   return (
@@ -72,7 +71,6 @@ const WalletDetailPage = () => {
           Detail [{wallet.name}]
         </h2>
         <div className="flex items-center space-x-4">
-          {/* Tombol Aksi di Kanan Atas */}
           <Link
             to="/topup"
             className="flex flex-col items-center text-gray-600 hover:text-green-600 p-2 rounded-lg border border-gray-300"
@@ -81,14 +79,14 @@ const WalletDetailPage = () => {
             <span className="text-xs font-semibold mt-1">Top Up</span>
           </Link>
           <Link
-            to={`/transfer?from=${walletId}`}
+            to={`/transfer?from=${wallet.number}`}
             className="flex flex-col items-center text-gray-600 hover:text-green-600 p-2 rounded-lg border border-gray-300"
           >
             <span className="text-xl">💸</span>
             <span className="text-xs font-semibold mt-1">Kirim</span>
           </Link>
           <Link
-            to={`/move?from=${walletId}`}
+            to={`/move?from=${wallet.number}`}
             className="flex flex-col items-center text-gray-600 hover:text-green-600 p-2 rounded-lg border border-gray-300"
           >
             <span className="text-xl">🔄</span>

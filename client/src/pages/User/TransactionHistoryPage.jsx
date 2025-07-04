@@ -1,54 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import api from "../../api/axiosConfig";
 import toast from "react-hot-toast";
-
-// Komponen untuk setiap item transaksi
-const TransactionItem = ({ tx }) => {
-  const isSuccess = tx.status === "Completed"; // Asumsi dari backend
-  const isCredit = tx.type === "Credit";
-
-  return (
-    <div className="flex justify-between items-center py-4 border-b border-gray-200 last:border-b-0">
-      <div className="flex items-center">
-        <div
-          className={`w-3 h-3 rounded-full mr-4 ${
-            isCredit ? "bg-green-500" : "bg-red-500"
-          }`}
-        ></div>
-        <div>
-          <p className="font-semibold text-gray-800">{tx.description}</p>
-          <div className="flex items-center text-xs text-gray-500 mt-1">
-            <span>
-              {new Date(tx.created_at).toLocaleString("id-ID", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </span>
-            <span
-              className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                isSuccess
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-              }`}
-            >
-              {isSuccess ? "Sukses" : "Gagal"}
-            </span>
-          </div>
-        </div>
-      </div>
-      <p
-        className={`font-semibold ${
-          isCredit ? "text-green-600" : "text-red-600"
-        }`}
-      >
-        {isCredit ? "+" : "-"} Rp. {tx.amount.toLocaleString("id-ID")}
-      </p>
-    </div>
-  );
-};
+import TransactionItem from "../../components/user/TransactionItem"; // <-- Import komponen baru
 
 const TransactionHistoryPage = () => {
   const [transactions, setTransactions] = useState([]);
@@ -70,18 +23,16 @@ const TransactionHistoryPage = () => {
           limit: 10,
         });
         if (filters.category) params.append("category", filters.category);
-        // Note: Backend tidak mendukung filter tanggal, jadi kita filter di frontend
-        // Jika backend mendukung, kirim sebagai query params.
 
         const response = await api.get("/transactions", { params });
 
         let filteredData = response.data.data;
 
-        // Filter tanggal di sisi klien (jika diperlukan)
+        // Karena backend tidak mendukung filter tanggal, kita lakukan di frontend
         if (filters.startDate && filters.endDate) {
           const start = new Date(filters.startDate);
           const end = new Date(filters.endDate);
-          end.setHours(23, 59, 59, 999); // Set ke akhir hari
+          end.setHours(23, 59, 59, 999);
 
           filteredData = filteredData.filter((tx) => {
             const txDate = new Date(tx.created_at);
@@ -110,14 +61,13 @@ const TransactionHistoryPage = () => {
 
   const handleFilterSubmit = (e) => {
     e.preventDefault();
-    setCurrentPage(1); // Reset ke halaman pertama saat filter baru diterapkan
+    setCurrentPage(1);
     fetchTransactions(1);
   };
 
   const handleReset = () => {
     setFilters({ category: "", startDate: "", endDate: "" });
     setCurrentPage(1);
-    // useEffect akan otomatis trigger fetch ulang karena dependency `filters`
   };
 
   return (
@@ -204,7 +154,9 @@ const TransactionHistoryPage = () => {
         {isLoading ? (
           <p className="text-center py-4">Memuat...</p>
         ) : transactions.length > 0 ? (
-          transactions.map((tx) => <TransactionItem key={tx.id} tx={tx} />)
+          transactions.map((tx) => (
+            <TransactionItem key={tx.id} transaction={tx} />
+          ))
         ) : (
           <p className="text-center py-4 text-gray-500">
             Tidak ada transaksi yang cocok dengan filter Anda.
@@ -212,8 +164,8 @@ const TransactionHistoryPage = () => {
         )}
       </div>
 
-      {/* Pagination (jika diperlukan) */}
-      {pagination.total_pages > 1 && (
+      {/* Pagination */}
+      {pagination && pagination.total_pages > 1 && (
         <div className="flex justify-center items-center space-x-2 mt-6">
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}

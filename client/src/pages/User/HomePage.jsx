@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import api from "../../api/axiosConfig";
 import toast from "react-hot-toast";
+import TransactionItem from "../../components/user/TransactionItem"; // <-- Import komponen baru
 
-// Komponen untuk setiap kartu dompet
 const WalletCard = ({ wallet }) => (
   <div className="bg-white p-4 rounded-lg border border-gray-200 flex justify-between items-center">
     <div>
@@ -22,26 +22,6 @@ const WalletCard = ({ wallet }) => (
   </div>
 );
 
-// Komponen untuk setiap item transaksi
-const TransactionItem = ({ tx }) => (
-  <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
-    <div>
-      <p className="font-semibold text-gray-800">{tx.description}</p>
-      <p className="text-xs text-gray-500">
-        {new Date(tx.created_at).toLocaleString("id-ID")}
-      </p>
-    </div>
-    <p
-      className={`font-semibold ${
-        tx.amount > 0 ? "text-green-600" : "text-red-600"
-      }`}
-    >
-      {tx.amount > 0 ? "+" : "-"} Rp.{" "}
-      {Math.abs(tx.amount).toLocaleString("id-ID")}
-    </p>
-  </div>
-);
-
 const HomePage = () => {
   const [wallets, setWallets] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -54,17 +34,16 @@ const HomePage = () => {
         api.get("/transactions?limit=5"),
       ]);
 
-      const fetchedWallets = walletsRes.data.data;
-      setWallets(fetchedWallets);
+      setWallets(walletsRes.data.data);
       setTransactions(transactionsRes.data.data);
 
-      const total = fetchedWallets.reduce(
+      const total = walletsRes.data.data.reduce(
         (sum, wallet) => sum + wallet.balance,
         0
       );
       setTotalBalance(total);
     } catch (error) {
-      toast.error("Failed to fetch data.");
+      toast.error("Gagal memuat data.");
     }
   }, []);
 
@@ -74,7 +53,7 @@ const HomePage = () => {
 
   return (
     <div className="space-y-8">
-      {/* Bagian Saldo */}
+      {/* Saldo Section */}
       <section className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <p className="text-gray-500 text-sm">Total Uang</p>
         <p className="text-3xl font-bold text-gray-800 mt-1">
@@ -96,7 +75,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Bagian Daftar Dompet */}
+      {/* Daftar Dompet Section */}
       <section>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <div className="flex justify-between items-center mb-4">
@@ -122,7 +101,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Bagian Riwayat Transaksi */}
+      {/* Riwayat Transaksi Section */}
       <section>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <div className="flex justify-between items-center mb-4">
@@ -137,7 +116,9 @@ const HomePage = () => {
             </Link>
           </div>
           {transactions.length > 0 ? (
-            transactions.map((tx) => <TransactionItem key={tx.id} tx={tx} />)
+            transactions.map((tx) => (
+              <TransactionItem key={tx.id} transaction={tx} />
+            ))
           ) : (
             <p className="text-center text-gray-500 py-4">
               Belum ada transaksi.
