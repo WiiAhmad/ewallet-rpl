@@ -1,4 +1,3 @@
-// src/routes/AppRoutes.jsx
 import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 import LoginPage from "../pages/Auth/LoginPage";
@@ -7,6 +6,12 @@ import HomePage from "../pages/User/HomePage";
 import AdminDashboardPage from "../pages/Admin/DashboardPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import useAuth from "../hooks/useAuth";
+
+// Import Halaman dan Layout Baru
+import MainLayout from "../layouts/MainLayout";
+import WalletDetailPage from "../pages/User/WalletDetailPage";
+import WalletCreatePage from "../pages/User/WalletCreatePage";
+import WalletEditPage from "../pages/User/WalletEditPage";
 
 const AppRoutes = () => {
   const { user } = useAuth();
@@ -33,9 +38,15 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Rute Terproteksi untuk User */}
+      {/* Rute Terproteksi untuk User dengan Layout Utama */}
       <Route element={<ProtectedRoute allowedRoles={["User"]} />}>
-        <Route path="/home" element={<HomePage />} />
+        <Route element={<MainLayout />}>
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/wallets/new" element={<WalletCreatePage />} />
+          <Route path="/wallets/:walletId" element={<WalletDetailPage />} />
+          <Route path="/wallets/:walletId/edit" element={<WalletEditPage />} />
+          {/* Tambahkan rute lain untuk user di sini, misal: /history, /support */}
+        </Route>
       </Route>
 
       {/* Rute Terproteksi untuk Admin & Owner */}
