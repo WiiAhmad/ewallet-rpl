@@ -12,6 +12,7 @@ import MainLayout from "../layouts/MainLayout";
 import WalletDetailPage from "../pages/User/WalletDetailPage";
 import WalletCreatePage from "../pages/User/WalletCreatePage";
 import WalletEditPage from "../pages/User/WalletEditPage";
+import TopUpPage from "../pages/User/TopUpPage"; // <-- Import Halaman Top Up
 
 const AppRoutes = () => {
   const { user } = useAuth();
@@ -45,6 +46,8 @@ const AppRoutes = () => {
           <Route path="/wallets/new" element={<WalletCreatePage />} />
           <Route path="/wallets/:walletId" element={<WalletDetailPage />} />
           <Route path="/wallets/:walletId/edit" element={<WalletEditPage />} />
+          <Route path="/topup" element={<TopUpPage />} />{" "}
+          {/* <-- Tambahkan Rute Top Up */}
           {/* Tambahkan rute lain untuk user di sini, misal: /history, /support */}
         </Route>
       </Route>

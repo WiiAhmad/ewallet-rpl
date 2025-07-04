@@ -36,3 +36,5 @@ server/generated/prisma
 *.njsproj
 *.sln
 *.sw?
+server/database/ewallet.db
+server/database/ewallet.db

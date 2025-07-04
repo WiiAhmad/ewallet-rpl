@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom"; // Import Link
+import { Link } from "react-router-dom";
 import api from "../../api/axiosConfig";
 import toast from "react-hot-toast";
 
-// Komponen WalletCard diperbarui dengan Link
+// Komponen untuk setiap kartu dompet
 const WalletCard = ({ wallet }) => (
   <div className="bg-white p-4 rounded-lg border border-gray-200 flex justify-between items-center">
     <div>
@@ -13,7 +13,6 @@ const WalletCard = ({ wallet }) => (
         Rp. {wallet.balance.toLocaleString("id-ID")}
       </p>
     </div>
-    {/* Perbarui ini untuk menggunakan Link */}
     <Link
       to={`/wallets/${wallet.wallet_id}`}
       className="text-green-600 font-semibold text-sm"
@@ -23,6 +22,7 @@ const WalletCard = ({ wallet }) => (
   </div>
 );
 
+// Komponen untuk setiap item transaksi
 const TransactionItem = ({ tx }) => (
   <div className="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
     <div>
@@ -74,23 +74,29 @@ const HomePage = () => {
 
   return (
     <div className="space-y-8">
-      {/* Saldo Section */}
+      {/* Bagian Saldo */}
       <section className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <p className="text-gray-500 text-sm">Total Uang</p>
         <p className="text-3xl font-bold text-gray-800 mt-1">
           Rp. {totalBalance.toLocaleString("id-ID")}
         </p>
         <div className="mt-6 grid grid-cols-2 gap-4">
-          <button className="flex items-center justify-center space-x-2 p-2 rounded hover:bg-gray-100">
+          <Link
+            to="/topup"
+            className="flex items-center justify-center space-x-2 p-2 rounded hover:bg-gray-100"
+          >
             <span className="font-semibold text-gray-700">Top Up</span>
-          </button>
-          <button className="flex items-center justify-center space-x-2 p-2 rounded hover:bg-gray-100">
+          </Link>
+          <Link
+            to="/transfer"
+            className="flex items-center justify-center space-x-2 p-2 rounded hover:bg-gray-100"
+          >
             <span className="font-semibold text-gray-700">Kirim</span>
-          </button>
+          </Link>
         </div>
       </section>
 
-      {/* Daftar Dompet Section */}
+      {/* Bagian Daftar Dompet */}
       <section>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <div className="flex justify-between items-center mb-4">
@@ -116,7 +122,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Riwayat Transaksi Section */}
+      {/* Bagian Riwayat Transaksi */}
       <section>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <div className="flex justify-between items-center mb-4">

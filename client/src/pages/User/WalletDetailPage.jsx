@@ -12,7 +12,7 @@ const WalletDetailPage = () => {
   const fetchWalletDetails = useCallback(async () => {
     setIsLoading(true);
     try {
-      // Sama seperti edit, kita ambil semua lalu filter
+      // Ambil semua wallet dan filter berdasarkan ID dari parameter URL
       const response = await api.get("/wallets/me");
       const foundWallet = response.data.data.find(
         (w) => w.wallet_id === parseInt(walletId)
@@ -71,10 +71,33 @@ const WalletDetailPage = () => {
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
           Detail [{wallet.name}]
         </h2>
-        <div className="flex space-x-2">{/* Icons Here */}</div>
+        <div className="flex items-center space-x-4">
+          {/* Tombol Aksi di Kanan Atas */}
+          <Link
+            to="/topup"
+            className="flex flex-col items-center text-gray-600 hover:text-green-600 p-2 rounded-lg border border-gray-300"
+          >
+            <span className="text-xl">⬆️</span>
+            <span className="text-xs font-semibold mt-1">Top Up</span>
+          </Link>
+          <Link
+            to={`/transfer?from=${walletId}`}
+            className="flex flex-col items-center text-gray-600 hover:text-green-600 p-2 rounded-lg border border-gray-300"
+          >
+            <span className="text-xl">💸</span>
+            <span className="text-xs font-semibold mt-1">Kirim</span>
+          </Link>
+          <Link
+            to={`/move?from=${walletId}`}
+            className="flex flex-col items-center text-gray-600 hover:text-green-600 p-2 rounded-lg border border-gray-300"
+          >
+            <span className="text-xl">🔄</span>
+            <span className="text-xs font-semibold mt-1">Pindah</span>
+          </Link>
+        </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 mt-4">
         <div>
           <p className="text-sm text-gray-500">Nama Kantong</p>
           <p className="font-semibold text-gray-800">{wallet.name}</p>
@@ -91,33 +114,19 @@ const WalletDetailPage = () => {
         </div>
       </div>
 
-      <div className="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
-        <Link
-          to="/home"
-          className="text-gray-600 font-medium hover:text-gray-800"
+      <div className="mt-8 pt-6 border-t border-gray-200 flex items-center justify-end space-x-4">
+        <button
+          onClick={handleDelete}
+          className="text-red-600 font-medium hover:text-red-800"
         >
-          Batal
+          Hapus Kantong
+        </button>
+        <Link
+          to={`/wallets/${walletId}/edit`}
+          className="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700"
+        >
+          Edit Kantong
         </Link>
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={handleDelete}
-            className="text-red-600 font-medium hover:text-red-800"
-          >
-            Hapus Kantong
-          </button>
-          <Link
-            to={`/transfer?from=${walletId}`}
-            className="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700"
-          >
-            Pindahkan Dana
-          </Link>
-          <Link
-            to={`/wallets/${walletId}/edit`}
-            className="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700"
-          >
-            Edit Kantong
-          </Link>
-        </div>
       </div>
     </div>
   );
