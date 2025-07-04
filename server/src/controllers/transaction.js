@@ -76,7 +76,8 @@ const getTransactionHistoryHandler = async (req, res, next) => {
     return next(err);
   }
 };
-// Get all transactions in the app (Admin/Owner only)
+
+// Handler untuk menampilkan semua riwayat transaksi
 async function getAllTransactionsHandler(req, res, next) {
   try {
     if (!["Admin", "Owner"].includes(req.userRole)) {
