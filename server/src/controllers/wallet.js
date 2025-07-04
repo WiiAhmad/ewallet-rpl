@@ -121,6 +121,11 @@ async function deleteWalletHandler(req, res, next) {
     if (wallet.name === 'Main') {
       return res.status(403).json({ message: 'Main wallet cannot be deleted' });
     }
+
+    if (wallet.balance > 0) {
+      return res.status(403).json({ message: 'Cannot delete wallet with non-zero balance' });
+    }
+
     const deleteWallet = await prisma.wallet.delete({
       where: { wallet_id: walletId }
     });
