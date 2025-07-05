@@ -33,3 +33,23 @@ git branch "name"       # example git branch x
 git checkout "name"     # example git checkout x
 ```
 done!!!
+
+after git clone
+
+npm i
+
+npm run postinstall
+
+npm run db
+
+npm run dev
+
+
+
+task list
+
+fix rejected handler topups
+
+fix transfer details
+
+done fix owner page

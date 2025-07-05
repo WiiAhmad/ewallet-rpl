@@ -50,6 +50,9 @@ const TransactionItem = ({ transaction }) => {
       : "bg-red-500"
     : "bg-gray-400";
 
+  // Tampilkan detail jika ada
+  const detail = transaction.detail;
+
   return (
     <div className="flex justify-between items-center py-4 border-b border-gray-200 last:border-b-0">
       <div className="flex items-center">
@@ -77,6 +80,29 @@ const TransactionItem = ({ transaction }) => {
             })}{" "}
             | {transaction.description}
           </p>
+          {/* Tampilkan detail jika ada */}
+          {detail && (
+            <div className="text-xs text-gray-600 mt-1">
+              {typeof detail === "object" ? (
+                <>
+                  {detail.from_wallet_number && (
+                    <div>
+                      <span className="font-semibold">Dari:</span> {detail.from_wallet_number} ({detail.sender_name || '-'}
+                      )
+                    </div>
+                  )}
+                  {detail.to_wallet_number && (
+                    <div>
+                      <span className="font-semibold">Ke:</span> {detail.to_wallet_number} ({detail.receiver_name || '-'}
+                      )
+                    </div>
+                  )}
+                </>
+              ) : (
+                <span>{detail}</span>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <p className={`font-bold text-base ${amountColor}`}>

@@ -80,6 +80,10 @@ async function updateWalletHandler(req, res, next) {
     if (!wallet) {
       return res.status(404).json({ message: 'Wallet not found' });
     }
+    // Prevent updating 'Main' wallet name
+    if (wallet.name === 'Main' && payload.name && payload.name !== 'Main') {
+      return res.status(403).json({ message: "Main wallet name cannot be changed" });
+    }
     const updateData = {};
     if (payload.name) updateData.name = payload.name;
     if (payload.desc) updateData.desc = payload.desc;
@@ -198,6 +202,7 @@ async function transferHandler(req, res, next) {
           number: fromWalletId,
           user: { uid: userId },
         },
+        include: { user: true }, // <-- Tambahkan agar fromWallet.user tersedia
       });
   
       if (!fromWallet) {
@@ -236,6 +241,17 @@ async function transferHandler(req, res, next) {
         prisma.type.findUnique({ where: { name: "Credit" } }),
       ]);
       
+      // Prepare detail JSON
+      const detailObj = {
+        from_wallet_number: fromWallet.number, // should be wallet number (string), not wallet_id
+        from_wallet_name: fromWallet.name,
+        to_wallet_number: toWallet.number, // should be wallet number (string), not wallet_id
+        to_wallet_name: toWallet.name,
+        sender_name: fromWallet.user ? fromWallet.user.name : undefined,
+        receiver_name: toWallet.user ? toWallet.user.name : undefined,
+      };
+      const detailJson = JSON.stringify(detailObj);
+
       await prisma.transaction.createMany({
         data: [
           {
@@ -245,6 +261,7 @@ async function transferHandler(req, res, next) {
             type_id: debitType?.type_id,
             description: note || `Transfer to ${toWallet.number}`,
             date: new Date(),
+            detail: detailJson,
           },
           {
             uid: toWallet.user.uid,
@@ -253,6 +270,7 @@ async function transferHandler(req, res, next) {
             type_id: creditType?.type_id,
             description: note || `Received from ${fromWallet.number}`,
             date: new Date(),
+            detail: detailJson,
           },
         ],
       });
@@ -432,7 +450,7 @@ async function getAllTopupsHandler(req, res, next) {
 async function approveTopupHandler(req, res, next) {
   const topupId = parseInt(req.params.topup_id);
   const adminId = req.userId;
-  const { admin_notes } = req.body;
+  const { admin_notes, status } = req.body;
 
   try {
     const topup = await prisma.topup.findUnique({
@@ -453,37 +471,60 @@ async function approveTopupHandler(req, res, next) {
       });
     }
 
-    // Update status topup dan balance wallet
-    const updated = await prisma.$transaction([
-      prisma.topup.update({
+    if (status === "Rejected") {
+      // Only update topup status, do not update wallet balance
+      const updatedTopup = await prisma.topup.update({
         where: { topup_id: topupId },
         data: {
-          status: "Completed",
+          status: "Rejected",
           approved_by: adminId,
           approved_at: new Date(),
           admin_notes,
         },
-      }),
-      prisma.wallet.update({
-        where: { wallet_id: topup.wallet_id },
+      });
+      return res.status(200).json({
+        message: "Top-up has been rejected.",
         data: {
-          balance: { increment: topup.amount },
+          topup_id: updatedTopup.topup_id,
+          wallet_id: topup.wallet.number,
+          amount: updatedTopup.amount,
+          status: "Rejected",
+          approved_by: adminId,
+          approved_at: updatedTopup.approved_at,
         },
-      }),
-    ]);
-
-    return res.status(200).json({
-      message: "Top-up approved successfully. Wallet balance has been updated.",
-      data: {
-        topup_id: topup.topup_id,
-        wallet_id: topup.wallet.number,
-        amount: topup.amount,
-        status: "Completed",
-        approved_by: adminId,
-        approved_at: new Date(),
-        updated_wallet_balance: updated[1].balance,
-      },
-    });
+      });
+    } else {
+      // Approve (Completed): update topup and wallet balance
+      const updated = await prisma.$transaction([
+        prisma.topup.update({
+          where: { topup_id: topupId },
+          data: {
+            status: "Completed",
+            approved_by: adminId,
+            approved_at: new Date(),
+            admin_notes,
+          },
+        }),
+        prisma.wallet.update({
+          where: { wallet_id: topup.wallet_id },
+          data: {
+            balance: { increment: topup.amount },
+          },
+        }),
+      ]);
+      return res.status(200).json({
+        message: "Top-up approved successfully. Wallet balance has been updated.",
+        data: {
+          topup_id: topup.topup_id,
+          wallet_id: topup.wallet.number,
+          amount: topup.amount,
+          status: "Completed",
+          approved_by: adminId,
+          approved_at: updated[0].approved_at,
+          updated_wallet_balance: updated[1].balance,
+        },
+      });
+    }
   } catch (err) {
     return next(err);
   }

@@ -20,7 +20,7 @@ const requireRole = (roles) => {
     // Use req.userRole (set by authenticateJWT)
     if (!roles.includes(req.userRole)) {
       // Custom message for Admin endpoints
-      if (roles.includes('Admin')) {
+      if (roles.includes('Admin') || roles.includes('Owner')) {
         return res.status(403).json({ message: 'Access denied. Admin role required.' });
       }
       return res.status(403).json({ message: 'Access Denied' });

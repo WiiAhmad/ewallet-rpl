@@ -61,8 +61,8 @@ app.get('/admin/transactions', authenticateJWT, requireRole(['Admin', 'Owner']),
 app.get('/admin/wallets', authenticateJWT, requireRole(['Admin', 'Owner']), getAllWalletsHandler);
 
 // Admin Topups
-app.get('/admin/topups', authenticateJWT, requireRole(['Admin']), getAllTopupsHandler);
-app.post('/topups/:topup_id/approve', authenticateJWT, requireRole(['Admin']), approveTopupHandler);
+app.get('/admin/topups', authenticateJWT, requireRole(['Admin', 'Owner']), getAllTopupsHandler);
+app.post('/topups/:topup_id/approve', authenticateJWT, requireRole(['Admin', 'Owner']), approveTopupHandler);
 
 // Owner analytics endpoint
 app.get('/owner/analytics', authenticateJWT, requireRole(['Owner']), (req, res) => {

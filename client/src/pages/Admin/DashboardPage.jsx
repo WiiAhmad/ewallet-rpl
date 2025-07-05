@@ -3,7 +3,7 @@ import api from "../../api/axiosConfig";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 
-const TopupRequestRow = ({ topup, onApprove }) => (
+const TopupRequestRow = ({ topup, onApprove, onReject, showApprove }) => (
   <tr className="bg-white border-b">
     <td className="py-4 px-6 text-sm font-medium text-gray-900">
       {topup.topup_id}
@@ -22,47 +22,121 @@ const TopupRequestRow = ({ topup, onApprove }) => (
         {topup.status}
       </span>
     </td>
-    <td className="py-4 px-6 text-sm font-medium">
-      <button
-        onClick={() => onApprove(topup.topup_id)}
-        className="text-green-600 hover:text-green-900"
-      >
-        Approve
-      </button>
-      {/* Tambahkan tombol Reject jika perlu */}
-    </td>
+    {showApprove && (
+      <td className="py-4 px-6 text-sm font-medium flex gap-2">
+        <button
+          onClick={() => onApprove(topup.topup_id)}
+          className="text-green-600 hover:text-green-900"
+        >
+          Approve
+        </button>
+        <button
+          onClick={() => onReject(topup.topup_id)}
+          className="text-red-600 hover:text-red-900"
+        >
+          Reject
+        </button>
+      </td>
+    )}
   </tr>
 );
 
 const AdminDashboardPage = () => {
   const { user, logout } = useAuth();
   const [topups, setTopups] = useState([]);
+  const [approvedTopups, setApprovedTopups] = useState([]);
+  const [pendingPagination, setPendingPagination] = useState(null);
+  const [approvedPagination, setApprovedPagination] = useState(null);
+  const [pendingPage, setPendingPage] = useState(1);
+  const [approvedPage, setApprovedPage] = useState(1);
+  const limit = 10;
 
-  const fetchTopups = useCallback(async () => {
+  const fetchTopups = useCallback(async (page = 1) => {
     try {
-      // Ambil hanya yang statusnya "Pending"
-      const res = await api.get("/admin/topups?status=Pending");
+      const res = await api.get(
+        `/admin/topups?status=Pending`
+      );
       setTopups(res.data.data);
+      setPendingPagination(res.data.pagination);
     } catch (error) {
       toast.error("Failed to fetch top-up requests.");
     }
   }, []);
 
+  const fetchApprovedTopups = useCallback(async (page = 1) => {
+    try {
+      const res = await api.get(
+        `/admin/topups`
+      );
+      setApprovedTopups(res.data.data);
+      setApprovedPagination(res.data.pagination);
+    } catch (error) {
+      toast.error("Failed to fetch approved top-ups.");
+    }
+  }, []);
+
   useEffect(() => {
-    fetchTopups();
-  }, [fetchTopups]);
+    fetchTopups(pendingPage);
+  }, [fetchTopups, pendingPage]);
+
+  useEffect(() => {
+    fetchApprovedTopups(approvedPage);
+  }, [fetchApprovedTopups, approvedPage]);
 
   const handleApprove = async (topupId) => {
     if (!window.confirm("Are you sure you want to approve this top-up?"))
       return;
-
     try {
-      await api.post(`/topups/${topupId}/approve`, { admin_notes: "Approved" });
+      await api.post(`/topups/${topupId}/approve`, { status: "Completed", admin_notes: "Approved" });
       toast.success("Top-up approved successfully!");
-      fetchTopups(); // Refresh list
+      fetchTopups(pendingPage); // Refresh list
+      fetchApprovedTopups(approvedPage); // Refresh approved list
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to approve top-up.");
     }
+  };
+
+  const handleReject = async (topupId) => {
+    const note = window.prompt("Enter reason for rejection:", "Rejected by admin");
+    if (note === null) return;
+    if (!window.confirm("Are you sure you want to reject this top-up?")) return;
+    try {
+      await api.post(`/topups/${topupId}/approve`, {
+        status: "Rejected", // must be exactly 'Rejected' for backend
+        admin_notes: note
+      });
+      toast.success("Top-up rejected.");
+      fetchTopups(pendingPage);
+      fetchApprovedTopups(approvedPage);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to reject top-up.");
+    }
+  };
+
+  // Optional: Pagination controls (simple prev/next)
+  const renderPagination = (pagination, page, setPage) => {
+    if (!pagination) return null;
+    return (
+      <div className="flex justify-end items-center gap-2 my-2">
+        <button
+          disabled={page <= 1}
+          onClick={() => setPage(page - 1)}
+          className="px-2 py-1 border rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span>
+          Page {pagination.current_page} of {pagination.total_pages}
+        </span>
+        <button
+          disabled={page >= pagination.total_pages}
+          onClick={() => setPage(page + 1)}
+          className="px-2 py-1 border rounded disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -85,7 +159,8 @@ const AdminDashboardPage = () => {
           <h2 className="text-2xl font-semibold mb-4">
             Pending Top-up Requests
           </h2>
-          <div className="overflow-x-auto relative shadow-md sm:rounded-lg">
+          {/* {renderPagination(pendingPagination, pendingPage, setPendingPage)} */}
+          <div className="overflow-x-auto relative shadow-md sm:rounded-lg mb-8">
             <table className="w-full text-sm text-left text-gray-500">
               <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                 <tr>
@@ -116,12 +191,57 @@ const AdminDashboardPage = () => {
                       key={topup.topup_id}
                       topup={topup}
                       onApprove={handleApprove}
+                      onReject={handleReject}
+                      showApprove={true}
                     />
                   ))
                 ) : (
                   <tr>
                     <td colSpan="6" className="text-center py-4">
                       No pending requests.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <h2 className="text-2xl font-semibold mb-4">Riwayat Approved</h2>
+          {/* {renderPagination(approvedPagination, approvedPage, setApprovedPage)} */}
+          <div className="overflow-x-auto relative shadow-md sm:rounded-lg">
+            <table className="w-full text-sm text-left text-gray-500">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                <tr>
+                  <th scope="col" className="py-3 px-6">
+                    ID
+                  </th>
+                  <th scope="col" className="py-3 px-6">
+                    User
+                  </th>
+                  <th scope="col" className="py-3 px-6">
+                    Amount
+                  </th>
+                  <th scope="col" className="py-3 px-6">
+                    Requested At
+                  </th>
+                  <th scope="col" className="py-3 px-6">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {approvedTopups.length > 0 ? (
+                  approvedTopups.map((topup) => (
+                    <TopupRequestRow
+                      key={topup.topup_id}
+                      topup={topup}
+                      showApprove={false}
+                    />
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="text-center py-4">
+                      No approved top-ups.
                     </td>
                   </tr>
                 )}

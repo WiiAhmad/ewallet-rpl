@@ -3,12 +3,16 @@ import { Link } from "react-router-dom";
 import api from "../../api/axiosConfig";
 import toast from "react-hot-toast";
 import TransactionItem from "../../components/user/TransactionItem"; // <-- Import komponen baru
+import TopupsItem from "../../components/user/TopupsItem";
 
 const WalletCard = ({ wallet }) => (
   <div className="bg-white p-4 rounded-lg border border-gray-200 flex justify-between items-center">
     <div>
       <h3 className="font-bold text-gray-800">{wallet.name}</h3>
       <p className="text-sm text-gray-500">{wallet.desc}</p>
+      <p className="text-xs text-gray-500 mt-1">
+        {wallet.number} {wallet.isMain ? "(Utama)" : ""}
+      </p>
       <p className="text-sm text-gray-800 font-semibold mt-2">
         Rp. {wallet.balance.toLocaleString("id-ID")}
       </p>
@@ -25,17 +29,20 @@ const WalletCard = ({ wallet }) => (
 const HomePage = () => {
   const [wallets, setWallets] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [topups, setTopups] = useState([]);
   const [totalBalance, setTotalBalance] = useState(0);
 
   const fetchData = useCallback(async () => {
     try {
-      const [walletsRes, transactionsRes] = await Promise.all([
+      const [walletsRes, transactionsRes, topupsRes] = await Promise.all([
         api.get("/wallets/me"),
         api.get("/transactions?limit=5"),
+        api.get("/topups?limit=5"),
       ]);
 
       setWallets(walletsRes.data.data);
       setTransactions(transactionsRes.data.data);
+      setTopups(topupsRes.data.data);
 
       const total = walletsRes.data.data.reduce(
         (sum, wallet) => sum + wallet.balance,
@@ -116,12 +123,39 @@ const HomePage = () => {
             </Link>
           </div>
           {transactions.length > 0 ? (
-            transactions.map((tx) => (
-              <TransactionItem key={tx.id} transaction={tx} />
-            ))
+            <div className="divide-y divide-gray-200">
+              {transactions.map((tx) => (
+                <TransactionItem key={tx.id} transaction={tx} />
+              ))}
+            </div>
           ) : (
             <p className="text-center text-gray-500 py-4">
               Belum ada transaksi.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-gray-800">
+              Riwayat Topups
+            </h2>
+            <Link
+              to="/history"
+              className="bg-green-100 text-green-700 font-bold py-2 px-4 rounded-lg text-sm hover:bg-green-200"
+            >
+              Lihat Semua
+            </Link>
+          </div>
+          {topups.length > 0 ? (
+            topups.map((topup) => (
+              <TopupsItem key={topup.topup_id} topup={topup} />
+            ))
+          ) : (
+            <p className="text-center text-gray-500 py-4">
+              Belum ada topup.
             </p>
           )}
         </div>

@@ -60,6 +60,7 @@ const getTransactionHistoryHandler = async (req, res, next) => {
       description: tx.description,
       status: "Completed",
       created_at: tx.date,
+      detail: tx.detail,
     }));
 
     return res.status(200).json({

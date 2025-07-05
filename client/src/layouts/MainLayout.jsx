@@ -35,9 +35,15 @@ const MainLayout = () => {
             <Link to="/history" className="text-gray-600 hover:text-green-600">
               Riwayat Trx
             </Link>
-            <Link to="/support" className="text-gray-600 hover:text-green-600">
-              Support
+            <Link
+              to="/topup-history"
+              className="text-gray-600 hover:text-green-600"
+            >
+              Riwayat Topup
             </Link>
+            {/* <Link to="/support" className="text-gray-600 hover:text-green-600">
+              Support
+            </Link> */}
           </nav>
           <div className="flex items-center">
             <span className="font-semibold mr-4">{user?.name}</span>

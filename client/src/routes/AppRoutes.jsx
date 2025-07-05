@@ -16,6 +16,7 @@ import TopUpPage from "../pages/User/TopUpPage";
 import TransactionHistoryPage from "../pages/User/TransactionHistoryPage";
 import TransferPage from "../pages/User/TransferPage";
 import MoveMoneyPage from "../pages/User/MoveMoneyPage"; // <-- Import halaman baru
+import TopUpHistoryPage from "../pages/User/TopUpHistoryPage";
 
 const AppRoutes = () => {
   const { user } = useAuth();
@@ -50,6 +51,7 @@ const AppRoutes = () => {
           <Route path="/wallets/:walletId" element={<WalletDetailPage />} />
           <Route path="/wallets/:walletId/edit" element={<WalletEditPage />} />
           <Route path="/topup" element={<TopUpPage />} />
+          <Route path="/topup-history" element={<TopUpHistoryPage />} />
           <Route path="/history" element={<TransactionHistoryPage />} />
           <Route path="/transfer" element={<TransferPage />} />
           <Route path="/move" element={<MoveMoneyPage />} />{" "}
