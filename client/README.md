@@ -123,7 +123,7 @@ Ikuti langkah-langkah berikut untuk menjalankan proyek ini di lingkungan lokal A
     - Tambahkan variabel berikut ke dalam file `.env`:
 
     ```
-    VITE_API_BASE_URL=http://localhost:3000/api
+    VITE_API_BASE_URL=http://localhost:3000/
     ```
 
     _Catatan: Pastikan URL ini sesuai dengan alamat server backend Anda yang sedang berjalan._
