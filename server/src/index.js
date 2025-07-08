@@ -4,11 +4,11 @@ import morgan from 'morgan';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { registerHandler, loginAuthHanlder, logoutHandler } from './controllers/auth.js';
-import { getUserHandler, updateUserHandler } from './controllers/user.js';
-import { authenticateJWT } from './middleware.js';
+import { getUserHandler, updateUserHandler, getAllUsersHandler } from './controllers/user.js';
+import { authenticateJWT, requireRole } from './middleware.js';
 import cors from 'cors';
-import { createWalletHandler, deleteWalletHandler, getOtherUserWalletHandler, getWalletsHandler, updateWalletHandler, transferHandler, requestTopupHandler, getAllTopupsHandler, approveTopupHandler } from './controllers/wallet.js';
-import { getTransactionHistoryHandler } from "./controllers/transaction.js";
+import { createWalletHandler, deleteWalletHandler, getOtherUserWalletHandler, getWalletsHandler, updateWalletHandler, transferHandler, requestTopupHandler, getAllTopupsHandler, approveTopupHandler, getAllWalletsHandler, getUserTopupHistoryHandler } from './controllers/wallet.js';
+import { getTransactionHistoryHandler, getAllTransactionsHandler } from "./controllers/transaction.js";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -20,7 +20,7 @@ app.use(cookieParser(process.env.JWT_SECRET));
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true
-}));
+})); 
 
 app.get('/db-check', async (req, res) => {
   try {
@@ -31,32 +31,44 @@ app.get('/db-check', async (req, res) => {
   }
 });
 
+app.use('/api', api);
+
+// Endpoint User
 app.post('/auth/register', registerHandler);
 app.post('/auth/login', loginAuthHanlder);
 app.post('/auth/logout', logoutHandler);
 
+// User Profile
 app.get('/user/me', authenticateJWT, getUserHandler);
 app.put('/user/me', authenticateJWT, updateUserHandler);
 
+// User Wallets
 app.post('/wallets', authenticateJWT, createWalletHandler)
 app.get('/wallets/me', authenticateJWT, getWalletsHandler)
 app.put('/wallets/:id', authenticateJWT, updateWalletHandler)
 app.delete('/wallets/:id', authenticateJWT, deleteWalletHandler)
-app.get('/wallets/:id', authenticateJWT, getOtherUserWalletHandler)
-
-app.use('/api', api);
+app.get('/wallets/:wallet_number', authenticateJWT, getOtherUserWalletHandler)
 app.post('/wallets/transfer', authenticateJWT, transferHandler);
+app.post('/wallets/:wallet_number/topup', authenticateJWT, requestTopupHandler);
 
-// Request top-up (user)
-app.post('/wallets/:id/topup', authenticateJWT, requestTopupHandler);
-
-// Get all top-up requests (admin only)
-app.get('/topups', authenticateJWT, getAllTopupsHandler);
-
-// Approve a top-up (admin only)
-app.post('/topups/:topup_id/approve', authenticateJWT, approveTopupHandler);
-
+// User History
+app.get('/topups', authenticateJWT, getUserTopupHistoryHandler);
 app.get('/transactions', authenticateJWT, getTransactionHistoryHandler);
+
+// Admin, Owner endpoints
+app.get('/admin/users', authenticateJWT, requireRole(['Admin', 'Owner']), getAllUsersHandler);
+app.get('/admin/transactions', authenticateJWT, requireRole(['Admin', 'Owner']), getAllTransactionsHandler);
+app.get('/admin/wallets', authenticateJWT, requireRole(['Admin', 'Owner']), getAllWalletsHandler);
+
+// Admin Topups
+app.get('/admin/topups', authenticateJWT, requireRole(['Admin', 'Owner']), getAllTopupsHandler);
+app.post('/topups/:topup_id/approve', authenticateJWT, requireRole(['Admin', 'Owner']), approveTopupHandler);
+
+// Owner analytics endpoint
+app.get('/owner/analytics', authenticateJWT, requireRole(['Owner']), (req, res) => {
+  res.json({ message: 'Analytics data (to be implemented)' });
+});
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

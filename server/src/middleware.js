@@ -17,11 +17,18 @@ const authenticateJWT = (req, res, next) => {
 
 const requireRole = (roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).send('Access Dennied');
+    // Use req.userRole (set by authenticateJWT)
+    if (!roles.includes(req.userRole)) {
+      // Custom message for Admin endpoints
+      if (roles.includes('Admin') || roles.includes('Owner')) {
+        return res.status(403).json({ message: 'Access denied. Admin role required.' });
+      }
+      return res.status(403).json({ message: 'Access Denied' });
     }
     next();
   };
 };
+// Contoh penggunaan di route:
+// router.get('/laporan', authenticate, requireRole(['ADMIN', 'OWNER']), getLaporan);
 
-export { authenticateJWT, requireRole};
+export { authenticateJWT, requireRole };

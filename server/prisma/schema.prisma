@@ -7,12 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  User
-  Admin
-  Owner
-}
-
 model User {
   uid           Int           @id @default(autoincrement())
   name          String
@@ -20,10 +14,11 @@ model User {
   email         String        @unique
   password      String
   address       String?
-  role          Role          @default(User)
+  role          String        @default("User") // User, Admin, Owner
   wallets       Wallet[]
   transactions  Transaction[]
   topups        Topup[]
+  approved      Topup[]       @relation("TopupApprovedBy")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
@@ -37,8 +32,8 @@ model Wallet {
   exp_date      DateTime?
   uid           Int
   user          User          @relation(fields: [uid], references: [uid], onDelete: Cascade)
-  transactions  Transaction[]
-  topups        Topup[]
+  transactions  Transaction[] 
+  topups        Topup[]       
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
@@ -48,37 +43,36 @@ model Transaction {
   uid           Int?
   user          User?         @relation(fields: [uid], references: [uid])
   wallet_id     Int
-  wallet        Wallet        @relation(fields: [wallet_id], references: [wallet_id], onDelete: Cascade)
-  value         Float
-  category_id   Int
-  category      Category      @relation(fields: [category_id], references: [category_id])
-  description   String
-  date          DateTime
-  confirmed     Boolean       @default(false)
-  confirmedBy   Int?
+  wallet        Wallet        @relation(fields: [wallet_id], references: [wallet_id], onDelete: NoAction)
+  amount        Float         
+  type_id       Int
+  type          Type          @relation(fields: [type_id], references: [type_id])
+  description   String        
+  date          DateTime 
+  detail        String?           
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }
 
-model Category {
-  category_id   Int           @id @default(autoincrement())
+model Type {
+  type_id       Int           @id @default(autoincrement())
   name          String        @unique
   transactions  Transaction[]
 }
 
 model Topup {
-  topup_id      Int      @id @default(autoincrement())         // primary key
-  wallet_id     Int                                           // FK ke Wallet
-  wallet        Wallet   @relation(fields: [wallet_id], references: [wallet_id], onDelete: Cascade)
-  user_id       Int                                           // FK ke User (si pengaju)
-  user          User     @relation(fields: [user_id], references: [uid])
-  amount        Float
+  topup_id       Int       @id @default(autoincrement())        // Primary key
+  wallet_id      Int                                            // FK ke Wallet
+  wallet         Wallet    @relation(fields: [wallet_id], references: [wallet_id], onDelete: Cascade)
+  user_id        Int                                            // FK ke User (si pengaju)
+  user           User      @relation(fields: [user_id], references: [uid])
+  amount         Float
   payment_method String
   reference_id   String
-  status        String   @default("pending")   // pending | completed | rejected
-  requested_at  DateTime @default(now())
-  approved_by   Int?                          // admin UID
-  approved_at   DateTime?
-  admin_notes   String?
-
+  status         String    @default("Pending")   // Pending | Completed | Rejected
+  requested_at   DateTime  @default(now())
+  approved       User?     @relation("TopupApprovedBy",fields: [approved_by], references: [uid])
+  approved_by    Int?                             // Admin UID
+  approved_at    DateTime?
+  admin_notes    String?
 }

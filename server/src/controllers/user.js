@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
-// Get current user info
+// Ambil informasi user
 async function getUserHandler(req, res, next) {
   try {
     const user = await prisma.user.findUnique({
@@ -40,7 +40,7 @@ async function updateUserHandler(req, res, next) {
     const updateData = {};
     if (payload.name) updateData.name = payload.name;
     if (payload.phone) updateData.phone = payload.phone;
-    // Only update email if provided
+    // Hanya update email jika ada masukkan
     if (payload.email !== undefined && payload.email !== '') updateData.email = payload.email;
     if (payload.address) updateData.address = payload.address;
     const updatedUser = await prisma.user.update({
@@ -64,15 +64,18 @@ async function updateUserHandler(req, res, next) {
 }
 
 async function getAllUsersHandler(req, res, next) {
-  
+  try {
+    // Hanya Admin dan Owner
+    if (!["Admin", "Owner"].includes(req.userRole)) {
+      return res.status(403).json({ message: "Access Denied" });
+    }
+    const users = await prisma.user.findMany({
+      select: { uid: true, name: true, email: true, role: true, createdAt: true }
+    });
+    return res.status(200).json({ message: 'All users', data: users });
+  } catch (err) {
+    return next(err);
+  }
 }
 
-async function getUserWalletsHandler(req, res, next) {
-  
-}
-
-async function getAllUserTransactionsHandler(params) {
-  
-}
-
-export { getUserHandler, updateUserHandler };
+export { getUserHandler, updateUserHandler, getAllUsersHandler };

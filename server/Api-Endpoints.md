@@ -483,6 +483,114 @@ Delete wallet
     }
     ```
 
+## 6. Transaction History (`/transactions`)
+
+### **`GET  /transactions`**
+- **Access**: Private (User)
+- **Headers** : *`Authorization: Bearer <your_access_token>`*
+- **Query Param (Optional)** :
+    - wallet_id=[wallet number]: Filter transactions by wallet number.
+    - category=[Debit|Credit]: Filter by transaction type.
+    - page=[page number]: Pagination page.
+    - limit=[items per page]: Pagination limit.
+
+- **Success Response (200)**:
+    ```json
+    {
+        "message": "Transactions retrieved successfully",
+        "data": [
+            {
+                "id": "txn_123",
+                "type": "Debit",
+                "amount": 50000,
+                "description": "Transfer to WLT-12345678",
+                "status": "Completed",
+                "created_at": "2025-06-24T19:00:00Z",
+            },
+            {
+                "id": "txn_124",
+                "type": "Credit",
+                "amount": 250000,
+                "description": "Top-up from Bank Transfer",
+                "status": "Completed",
+                "created_at": "2025-06-24T18:50:00Z",
+            }
+        ],
+        "pagination": {
+            "current_page": 1,
+            "total_pages": 5,
+            "total_items": 48,
+            "items_per_page": 10
+        }
+    }
+    ```
+- **Unauthorized Response (401)**:
+    ```json
+    {
+        "message": "User Unauthorized, Please Login Again"
+    }
+    ```
+
+---
+
+## 7. All Transactions (`/admin/transactions`)
+
+### **`GET  /admin/transactions`**
+- **Access**: Private (Admin/Owner)
+- **Headers** : *`Authorization: Bearer <admin_access_token>`*
+- **Query Param (Optional)** :
+    - page=[page number]: Pagination page.
+    - limit=[items per page]: Pagination limit.
+
+- **Success Response (200)**:
+    ```json
+    {
+        "message": "All transactions",
+        "data": [
+            {
+                "id": "txn_123",
+                "user": {
+                    "uid": 1,
+                    "name": "Alice",
+                    "email": "alice@example.com"
+                },
+                "wallet": {
+                    "wallet_id": 2,
+                    "name": "Main Wallet",
+                    "number": "WLT-87654321"
+                },
+                "type": "Debit",
+                "amount": 50000,
+                "description": "Transfer to WLT-12345678",
+                "status": "Completed",
+                "created_at": "2025-06-24T19:00:00Z",
+                "from_wallet": "WLT-87654321",
+                "to_wallet": "WLT-12345678"
+            }
+            // ... more transactions
+        ],
+        "pagination": {
+            "current_page": 1,
+            "total_pages": 5,
+            "total_items": 48,
+            "items_per_page": 10
+        }
+    }
+    ```
+- **Unauthorized/Forbidden Response (401/403)**:
+    ```json
+    {
+        "message": "Access Denied"
+    }
+    ```
+
+---
+
+**Notes:**
+- For transfer transactions, `from_wallet` and `to_wallet` will be filled based on the transaction description and wallet number.
+- For non-transfer transactions (like top-up), these fields will be `null`.
+- The `type` field will be `"Debit"` or `"Credit"` as per your transaction type.
+
 ### **`GET  /topups`**
 - **Access**: Private (Admin Role Required)
 - **Headers** : *`Authorization: Bearer <admin_access_token>`*

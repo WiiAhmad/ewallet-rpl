@@ -7,8 +7,9 @@
     "dev:server" : "cd server && npm run dev",
     "install:client" : "cd client && npm i",
     "install:server" : "cd server && npm i",
+    "postinstall": "npm install && npm run install:client && npm run install:server",
+    "db" : "cd server && npx prisma generate && npx prisma db push && npm run seed",
     "dev" : "concurrently \"npm run dev:client\" \"npm run dev:server\" ",
-    "all" : "concurrently \"npm run install:client\" \"npm run install:server\" ",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
