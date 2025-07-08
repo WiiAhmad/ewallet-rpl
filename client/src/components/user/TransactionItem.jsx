@@ -1,26 +1,23 @@
 import React from "react";
 
+// Helper function to get display details from a transaction object
 const getTransactionDetails = (tx) => {
-  // Menentukan apakah transaksi merupakan pemasukan (Credit)
   const isCredit = tx.type === "Credit";
   let title = tx.description;
 
-  // Logika sederhana untuk menentukan judul yang lebih mudah dibaca
+  // Simplified logic for a more readable title
+  const descriptionLower = tx.description.toLowerCase();
   if (isCredit) {
-    if (
-      tx.description.toLowerCase().includes("topup") ||
-      tx.description.toLowerCase().includes("top up")
-    ) {
+    if (descriptionLower.includes("topup") || descriptionLower.includes("top up")) {
       title = "Top Up";
-    } else if (tx.description.toLowerCase().includes("received from")) {
-      title = "Pindah Dana";
+    } else if (descriptionLower.includes("received from")) {
+      title = "Dana Diterima";
     } else {
       title = "Pemasukan";
     }
-  } else {
-    // Jika bukan Credit, berarti Debit (pengeluaran)
-    if (tx.description.toLowerCase().includes("transfer to")) {
-      title = "Kirim dan Bayar";
+  } else { // Debit
+    if (descriptionLower.includes("transfer to")) {
+      title = "Kirim Dana";
     } else {
       title = "Pengeluaran";
     }
@@ -29,8 +26,6 @@ const getTransactionDetails = (tx) => {
   return {
     title,
     isCredit,
-    // Backend saat ini hanya mengirim status "Completed", jadi kita anggap "Sukses".
-    // UI ini siap untuk menampilkan "Gagal" jika data dari backend tersedia.
     isSuccess: tx.status === "Completed",
   };
 };
@@ -38,75 +33,73 @@ const getTransactionDetails = (tx) => {
 const TransactionItem = ({ transaction }) => {
   const { title, isCredit, isSuccess } = getTransactionDetails(transaction);
 
-  // Menentukan warna berdasarkan tipe transaksi (sesuai gambar)
-  // Pemasukan (Top Up) = Hijau, Pengeluaran (Kirim) = Merah
-  const amountColor = isCredit ? "text-green-600" : "text-red-600";
-  const statusColor = isSuccess
-    ? "bg-green-100 text-green-800"
-    : "bg-red-100 text-red-800";
-  const dotColor = isSuccess
-    ? isCredit
-      ? "bg-green-500"
-      : "bg-red-500"
-    : "bg-gray-400";
+  // Parse transaction.detail string into an object
+  // Use a try-catch block to prevent errors if the detail is not valid JSON
+  let detail = null;
+  if (transaction.detail && typeof transaction.detail === 'string') {
+    try {
+      detail = JSON.parse(transaction.detail);
+    } catch (error) {
+      console.error("Failed to parse transaction detail:", error);
+      // Fallback to display the raw string if parsing fails
+      detail = transaction.detail;
+    }
+  }
 
-  // Tampilkan detail jika ada
-  const detail = transaction.detail;
+
+  // Define colors based on transaction type and status
+  const amountColor = isCredit ? "text-green-600" : "text-red-600";
+  const statusColor = isSuccess ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
+  const dotColor = isSuccess ? (isCredit ? "bg-green-500" : "bg-red-500") : "bg-gray-400";
 
   return (
     <div className="flex justify-between items-center py-4 border-b border-gray-200 last:border-b-0">
       <div className="flex items-center">
-        {/* Indikator titik berwarna */}
-        <div className={`w-2.5 h-2.5 rounded-full mr-4 ${dotColor}`}></div>
+        {/* Color dot indicator */}
+        <div className={`w-2.5 h-2.5 rounded-full mr-4 flex-shrink-0 ${dotColor}`}></div>
+        
         <div>
           <p className="font-semibold text-gray-800 flex items-center">
             {title}
             {/* Status badge */}
-            <span
-              className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${statusColor}`}
-            >
+            <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${statusColor}`}>
               {isSuccess ? "Sukses" : "Gagal"}
             </span>
           </p>
+          
           <p className="text-sm text-gray-500 mt-1">
-            {/* Format tanggal yang lebih lengkap */}
+            {/* Format date for better readability */}
             {new Date(transaction.created_at).toLocaleString("id-ID", {
-              day: "numeric",
+              day: "2-digit",
               month: "short",
               year: "numeric",
               hour: "2-digit",
               minute: "2-digit",
-              second: "2-digit",
-            })}{" "}
-            | {transaction.description}
+            })}
           </p>
-          {/* Tampilkan detail jika ada */}
-          {detail && (
-            <div className="text-xs text-gray-600 mt-1">
-              {typeof detail === "object" ? (
-                <>
-                  {detail.from_wallet_number && (
-                    <div>
-                      <span className="font-semibold">Dari:</span> {detail.from_wallet_number} ({detail.sender_name || '-'}
-                      )
-                    </div>
-                  )}
-                  {detail.to_wallet_number && (
-                    <div>
-                      <span className="font-semibold">Ke:</span> {detail.to_wallet_number} ({detail.receiver_name || '-'}
-                      )
-                    </div>
-                  )}
-                </>
-              ) : (
-                <span>{detail}</span>
+
+          {/* Display parsed details if they exist */}
+          {detail && typeof detail === "object" ? (
+            <div className="text-xs text-gray-600 mt-1 space-y-0.5">
+              {detail.from_wallet_number && (
+                <div>
+                  <span className="font-semibold">Dari:</span> {detail.from_wallet_number} ({detail.sender_name || 'N/A'})
+                </div>
+              )}
+              {detail.to_wallet_number && (
+                <div>
+                  <span className="font-semibold">Ke:</span> {detail.to_wallet_number} ({detail.receiver_name || 'N/A'})
+                </div>
               )}
             </div>
+          ) : (
+             <p className="text-sm text-gray-500 mt-1">{transaction.description}</p>
           )}
         </div>
       </div>
-      <p className={`font-bold text-base ${amountColor}`}>
-        Rp. {transaction.amount.toLocaleString("id-ID")}
+      
+      <p className={`font-bold text-base whitespace-nowrap ${amountColor}`}>
+         {isCredit ? '+' : '-'} Rp{transaction.amount.toLocaleString("id-ID")}
       </p>
     </div>
   );

@@ -35,21 +35,18 @@ git checkout "name"     # example git checkout x
 done!!!
 
 after git clone
-
+```
 npm i
-
 npm run postinstall
-
 npm run db
-
 npm run dev
-
+```
 
 
 task list
 
-fix rejected handler topups
+(done) rejected handler topups
 
-fix transfer details
+(done) fix transfer details
 
-done fix owner page
+(done) fix owner page

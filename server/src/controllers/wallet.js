@@ -453,6 +453,11 @@ async function approveTopupHandler(req, res, next) {
   const { admin_notes, status } = req.body;
 
   try {
+    if (!admin_notes || !status) {
+      return res.status(400).json({
+        message: "Missing required fields: admin_notes and status are required.",
+      });
+    }
     const topup = await prisma.topup.findUnique({
       where: { topup_id: topupId },
       include: { wallet: true },
@@ -464,14 +469,14 @@ async function approveTopupHandler(req, res, next) {
         .json({ message: "Topup with the specified id not found." });
     }
 
-    if (topup.status !== "Pending") {
+    if (topup.status !== "Pending" || topup.status !== "Rejected" || topup.status === "Completed") {
       return res.status(422).json({
         message: "This topup request cannot be processed.",
         details: "The request has already been completed or rejected.",
       });
     }
 
-    if (status === "Rejected") {
+    if (status == "Rejected") {
       // Only update topup status, do not update wallet balance
       const updatedTopup = await prisma.topup.update({
         where: { topup_id: topupId },
