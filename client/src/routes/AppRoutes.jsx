@@ -18,6 +18,7 @@ import TransferPage from "../pages/User/TransferPage";
 import MoveMoneyPage from "../pages/User/MoveMoneyPage"; // <-- Import halaman baru
 import TopUpHistoryPage from "../pages/User/TopUpHistoryPage";
 
+import AdminLayout from "../layouts/AdminLayout";
 const AppRoutes = () => {
   const { user } = useAuth();
 
@@ -59,9 +60,15 @@ const AppRoutes = () => {
       </Route>
 
       {/* Rute Terproteksi untuk Admin & Owner */}
-      <Route element={<ProtectedRoute allowedRoles={["Admin", "Owner"]} />}>
+      <Route element={<ProtectedRoute allowedRoles={["Owner", "Admin"]} />}>
         <Route path="/dashboard" element={<AdminDashboardPage />} />
       </Route>
+
+      {/* <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>
+        <Route element={<AdminLayout />}>
+          <Route path="/dashboard" element={<AdminDashboardPage />} />
+        </Route>
+      </Route> */}
 
       {/* Rute Lainnya */}
       <Route path="/unauthorized" element={<div>Unauthorized Access</div>} />

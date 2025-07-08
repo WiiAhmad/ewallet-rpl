@@ -26,13 +26,13 @@ const TopupRequestRow = ({ topup, onApprove, onReject, showApprove }) => (
       <td className="py-4 px-6 text-sm font-medium flex gap-2">
         <button
           onClick={() => onApprove(topup.topup_id)}
-          className="text-green-600 hover:text-green-900"
+          className="text-green-600 hover:text-green-900 mr-2 bg-transparent border border-green-600 hover:border-green-900 rounded px-3 py-1 transition-colors duration-200"
         >
           Approve
         </button>
         <button
           onClick={() => onReject(topup.topup_id)}
-          className="text-red-600 hover:text-red-900"
+          className="text-red-600 hover:text-red-900 bg-transparent border border-red-600 hover:border-red-900 rounded px-3 py-1 transition-colors duration-200"
         >
           Reject
         </button>

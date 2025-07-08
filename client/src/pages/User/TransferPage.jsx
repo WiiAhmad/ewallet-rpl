@@ -122,7 +122,7 @@ const TransferPage = () => {
             ))}
           </select>
         </div>
-        <div>
+                <div>
           <label
             htmlFor="amount"
             className="block text-sm font-medium text-gray-700 mb-1"
@@ -136,10 +136,29 @@ const TransferPage = () => {
             value={formData.amount}
             onChange={handleChange}
             required
-            min="1"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
-            placeholder="Nominal pengiriman uang"
+            placeholder="Nominal top up"
           />
+          {/* Quick amount buttons */}
+          <p className="text-xs text-gray-500 mt-1">
+            Atau pilih nominal cepat:
+          </p>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {[50000, 100000, 250000, 500000].map((amt) => (
+              <button
+                type="button"
+                key={amt}
+                className={`px-3 py-1 rounded-md border border-green-500 text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400 ${
+                  formData.amount == amt ? "bg-green-200 font-bold" : ""
+                }`}
+                onClick={() =>
+                  setFormData((prev) => ({ ...prev, amount: amt }))
+                }
+              >
+                Rp {amt.toLocaleString("id-ID")}
+              </button>
+            ))}
+          </div>
         </div>
         <div>
           <label

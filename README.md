@@ -50,3 +50,7 @@ task list
 (done) fix transfer details
 
 (done) fix owner page
+
+fix admin dashboard show all user topups
+
+fix admin dashboard show all user transactions

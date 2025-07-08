@@ -91,6 +91,7 @@ const TopUpPage = () => {
             ))}
           </select>
         </div>
+
         <div>
           <label
             htmlFor="amount"
@@ -128,6 +129,25 @@ const TopUpPage = () => {
               </button>
             ))}
           </div>
+        </div>
+        
+        <div
+          className="flex items-center space-x-4 mt-4"
+        >
+          <label className="text-sm font-medium text-gray-700">
+            Metode Pembayaran
+          </label>
+          <select
+            name="payment_method"
+            id="payment_method"
+            value={formData.payment_method}
+            onChange={handleChange}
+            className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+          >
+            <option value="Bank Transfer">Transfer Bank</option>
+            <option value="E-Wallet">E-Wallet</option>
+            <option value="Cash">Tunai</option>
+          </select>
         </div>
         <div>
           <label
