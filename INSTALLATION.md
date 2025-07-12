@@ -2,14 +2,20 @@
 
 ## Cara Menjalankan Project
 
-1. **Clone repository ini**
-2. **Masuk ke folder project**
+1. **Masuk ke folder project**
    ```
    cd ewallet-rpl
    ```
-3. **Install semua dependencies**
+2. **Install semua dependencies**
    ```
    npm install
+   ```
+3. **Inisialisasi Prisma**
+   ```
+   cd server
+   npx prisma migrate
+   npx prisma studio   # Menjalankan db
+   cd ../              # Untuk kembali ke root direktori
    ```
 4. **Jalankan server dan client secara bersamaan**
    ```
@@ -22,7 +28,7 @@
   ```
   npm run all
   ```
-- **Setelah clone, untuk setup awal**
+- **Lakukan ini untuk inisialisasi untuk setup awal**
   ```
   npm i
   npm run postinstall
