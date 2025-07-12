@@ -165,6 +165,3 @@ Kontribusi untuk pengembangan proyek ini sangat kami hargai. Jika Anda ingin ber
 4.  Push ke branch Anda (`git push origin fitur/NamaFiturAnda`).
 5.  Buka sebuah Pull Request untuk ditinjau.
 
-## Lisensi
-
-Proyek ini dilisensikan di bawah [Lisensi MIT](https://opensource.org/licenses/MIT).

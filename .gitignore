@@ -25,6 +25,7 @@ server/*.local
 server/.env
 server/database/*.db
 server/generated/prisma
+server/prisma/migrations
 
 # Editor directories and files
 .vscode/*
