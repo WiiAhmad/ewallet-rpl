@@ -34,22 +34,6 @@ E-Wall adalah aplikasi dompet digital yang memungkinkan pengguna untuk membuat b
 
 ---
 
-## Struktur Proyek
-ewallet-rpl/ 
-├── client/ # Frontend React 
-│ ├── src/ 
-│ ├── public/ 
-│ └── ... 
-├── server/ # Backend Express/Prisma 
-│ ├── src/ 
-│ ├── prisma/ 
-│ ├── database/ 
-│ └── ... 
-├── E-Wall.postman_collection.json 
-└── README.md
-
----
-
 ## Catatan
 
 - Semua endpoint yang membutuhkan autentikasi harus menyertakan header `Authorization`.
