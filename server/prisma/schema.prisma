@@ -42,8 +42,8 @@ model Transaction {
   trans_id      Int           @id @default(autoincrement())
   uid           Int?
   user          User?         @relation(fields: [uid], references: [uid])
-  wallet_id     Int
-  wallet        Wallet        @relation(fields: [wallet_id], references: [wallet_id], onDelete: NoAction)
+  wallet_id     Int?
+  wallet        Wallet?        @relation(fields: [wallet_id], references: [wallet_id], onDelete: SetNull)
   amount        Float         
   type_id       Int
   type          Type          @relation(fields: [type_id], references: [type_id])
@@ -62,8 +62,8 @@ model Type {
 
 model Topup {
   topup_id       Int       @id @default(autoincrement())        // Primary key
-  wallet_id      Int                                            // FK ke Wallet
-  wallet         Wallet    @relation(fields: [wallet_id], references: [wallet_id], onDelete: Cascade)
+  wallet_id      Int?                                            // FK ke Wallet
+  wallet         Wallet?    @relation(fields: [wallet_id], references: [wallet_id], onDelete: SetNull)
   user_id        Int                                            // FK ke User (si pengaju)
   user           User      @relation(fields: [user_id], references: [uid])
   amount         Float

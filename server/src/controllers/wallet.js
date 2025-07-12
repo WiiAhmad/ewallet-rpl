@@ -469,7 +469,7 @@ async function approveTopupHandler(req, res, next) {
         .json({ message: "Topup with the specified id not found." });
     }
 
-    if (topup.status !== "Pending" || topup.status !== "Rejected" || topup.status === "Completed") {
+    if (topup.status !== "Pending") {
       return res.status(422).json({
         message: "This topup request cannot be processed.",
         details: "The request has already been completed or rejected.",
