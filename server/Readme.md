@@ -1,13 +1,13 @@
 # E-Wall API Documentation
 
-This document provides details on the available API endpoints for the E-Wall wallet service, based on the provided Postman collection.
+Dokumen ini berisi detail endpoint API yang tersedia untuk E-Wall, berdasarkan Postman collection yang disediakan.
 
-**Base URL**: `/api`
-
-**Authentication**: Most endpoints require a JSON Web Token (JWT) to be passed in the `Authorization` header with the `Bearer` scheme.
+**Authentication**: Sebagian besar endpoint membutuhkan JSON Web Token (JWT) yang harus dikirimkan pada header `Authorization` dengan `Bearer`.
 ```
 Authorization: Bearer <your_access_token>
 ```
+
+***Catatan:** Backend ini juga menggunakan cookies untuk menyimpan JWT secara otomatis setelah login, sehingga dapat mengakses endpoint yang membutuhkan autentikasi tanpa perlu mengirim header Authorization secara manual jika menggunakan browser atau Postman dengan cookie support.
 
 ---
 
