@@ -48,10 +48,10 @@ E-Wall adalah aplikasi dompet digital yang memungkinkan pengguna untuk membuat b
 
 |         Nama        | Path |    NIP    |
 |---------------------|------|-----------|
-| Lorem Ipsum Doloros |  FE  | 14522669  |
-| Doloros Ipsum Lorem |  FE  | 14522669  |
-| Ipsum Ipsum Doloros |  BE  | 14522669  |
-| Lorem Lorem Doloros |  BE  | 14522669  |
+| Ahmad Maulana Yusuf |  FS  | 14522665  |
+| Dimas Rizky Maulana |  FE  | 14522669  |
+| Satria Sukma Auraly |  BE  | 14522669  |
+| Ilham Ramadhan |  BE  | 14522669  |
 
 ---
 

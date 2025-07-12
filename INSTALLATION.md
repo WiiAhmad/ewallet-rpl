@@ -10,30 +10,17 @@
    ```
    npm install
    ```
-3. **Inisialisasi Prisma**
-   ```
-   cd server
-   npx prisma migrate
-   npx prisma studio   # Menjalankan db
-   cd ../              # Untuk kembali ke root direktori
-   ```
-4. **Jalankan server dan client secara bersamaan**
+
+3. **Jalankan server dan client secara bersamaan**
    ```
    npm run dev
    ```
 
 ### Perintah Lain
 
-- **Install semua dependencies (opsional)**
+- **Melihat isi database Sqlite (opsional)**
   ```
-  npm run all
-  ```
-- **Lakukan ini untuk inisialisasi untuk setup awal**
-  ```
-  npm i
-  npm run postinstall
-  npm run db
-  npm run dev
+   npm run db
   ```
 
 ---
@@ -47,12 +34,11 @@
 
 ## Cara Berkontribusi
 
-- **Selalu buat branch baru untuk setiap pekerjaan. Jangan push langsung ke `main`, push ke `dev`.**
+- **Selalu buat branch baru untuk setiap pekerjaan. Jangan push langsung ke `main`.**
   ```
   git branch nama_branch
   git checkout nama_branch
   ```
-- Setelah selesai, lakukan pull request ke branch `dev`.
 
 ---
 
