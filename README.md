@@ -1,56 +1,58 @@
-# TO RUN THIS
-after clonning repo
+# E-Wall
 
-cd to folder 
-```
-npm install
-```
+## Cara Menjalankan Project
 
-for install all dependencies run this
-```
-npm run all
-```
+1. **Clone repository ini**
+2. **Masuk ke folder project**
+   ```
+   cd ewallet-rpl
+   ```
+3. **Install semua dependencies**
+   ```
+   npm install
+   ```
+4. **Jalankan server dan client secara bersamaan**
+   ```
+   npm run dev
+   ```
 
-for run both server and client
-```
-npm run dev
-```
+### Perintah Lain
 
-## Server
-[README.MD SERVER](/server/README.md)
+- **Install semua dependencies (opsional)**
+  ```
+  npm run all
+  ```
+- **Setelah clone, untuk setup awal**
+  ```
+  npm i
+  npm run postinstall
+  npm run db
+  npm run dev
+  ```
 
-[API DOCUMENTATION SERVER](/server/Api-Docs.md)
+---
 
-## Client
-[README.MD CLIENT](/client/README.md)
+## Dokumentasi
 
+- [Dokumentasi API Server](/server/README.md)
+- [README Client](/client/README.md)
 
-## How to Contribute?
-make sure create branch for work **dont push to main** push to dev
+---
 
-```
-git branch "name"       # example git branch x
-git checkout "name"     # example git checkout x
-```
-done!!!
+## Cara Berkontribusi
 
-after git clone
-```
-npm i
-npm run postinstall
-npm run db
-npm run dev
-```
+- **Selalu buat branch baru untuk setiap pekerjaan. Jangan push langsung ke `main`, push ke `dev`.**
+  ```
+  git branch nama_branch
+  git checkout nama_branch
+  ```
+- Setelah selesai, lakukan pull request ke branch `dev`.
 
+---
 
-task list
+## Catatan
 
-(done) rejected handler topups
-
-(done) fix transfer details
-
-(done) fix owner page
-
-fix admin dashboard show all user topups
-
-fix admin dashboard show all user transactions
+- Semua endpoint yang membutuhkan autentikasi harus menyertakan header `Authorization`.
+- Untuk transfer dan topup, lihat contoh request/response pada endpoint transaksi dan topup.
+- Pagination didukung pada sebagian besar endpoint list melalui query parameter `page` dan `limit`.
+- Untuk detail lebih lanjut, lihat [Postman Collection](./E-Wall.postman_collection.json)
