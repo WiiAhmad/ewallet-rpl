@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node src/index.js",
     "seed": "node prisma/seed.js",
-    "env" : "copy .env.example .env && npx prisma generate && npx prisma db push"
+    "env" : "copy .env.example .env && npx prisma generate && npx prisma db push && npm run seed"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
