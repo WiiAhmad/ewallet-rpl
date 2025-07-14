@@ -49,9 +49,9 @@ E-Wall adalah aplikasi dompet digital yang memungkinkan pengguna untuk membuat b
 |         Nama        | Path |    NIP    |
 |---------------------|------|-----------|
 | Ahmad Maulana Yusuf |  FS  | 14522665  |
-| Dimas Rizky Maulana |  FE  | 14522669  |
-| Satria Sukma Auraly |  BE  | 14522669  |
-| Ilham Ramadhan |  BE  | 14522669  |
+| Dimas Rizky Maulana |  FE  | 14522707  |
+| Satria Sukma Auraly |  BE  | 14522667  |
+| Ilham Ramadhan |  BE  | 14522727  |
 
 ---
 
